@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calendar Dashboard</title>
-
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 h-screen">
@@ -51,7 +51,7 @@
                 </button>
               </div>
               <div class="ml-6 h-6 w-px bg-gray-300"></div>
-              <button type="button" class="ml-6 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Add event</button>
+              <a href="{{ route('tasks.create') }}" class="ml-6 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Add event</a>
             </div>
           </div>
         </header>
@@ -69,6 +69,10 @@
 
           <div class="flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto">
             <div class="w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px" id="calendar-grid">
+              <!-- Loading indicator -->
+              <div id="loading" class="col-span-7 flex items-center justify-center h-64">
+                <div class="text-gray-500">Loading calendar...</div>
+              </div>
             </div>
           </div>
         </div>
@@ -76,67 +80,147 @@
     </div>
   </div>
 
-</body>
-</html>
+  <!-- Task Detail Modal -->
+  <div id="taskModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Task Details</h3>
+              <div class="mt-2" id="modal-content">
+                <!-- Task details will be inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" id="closeModal" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script>
 class RealTimeCalendar {
   constructor() {
-    this.viewDate = new Date(); // Digunakan untuk render bulan aktif
-    this.events = this.loadEvents();
+    this.viewDate = new Date();
+    this.events = {};
+    this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.init();
   }
 
   init() {
     this.setupEventListeners();
     this.render();
-    this.startClock(); // optional: update current time setiap menit
+    this.loadEvents();
   }
 
-  loadEvents() {
-    return {
-      '2025-07-04': [
-        { title: 'Independence Day', time: '10:00', datetime: '2025-07-04T10:00' },
-        { title: 'BBQ Party', time: '6:00 PM', datetime: '2025-07-04T18:00' }
-      ],
-      '2025-07-15': [
-        { title: 'Team Meeting', time: '2:00 PM', datetime: '2025-07-15T14:00' }
-      ],
-      '2025-07-20': [
-        { title: 'Project Deadline', time: '5:00 PM', datetime: '2025-07-20T17:00' }
-      ]
-    };
+  async loadEvents() {
+    try {
+      const start = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 1);
+      const end = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() + 1, 0);
+      
+      // FIX: Format tanggal dengan benar tanpa timezone shift
+      const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      
+      const response = await fetch(`/calendar/events?start=${formatDate(start)}&end=${formatDate(end)}`, {
+        headers: {
+          'X-CSRF-TOKEN': this.csrfToken,
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response.ok) {
+        this.events = await response.json();
+        this.render();
+      }
+    } catch (error) {
+      console.error('Error loading events:', error);
+    }
   }
 
   setupEventListeners() {
     document.getElementById('prevMonth').addEventListener('click', () => {
       this.viewDate.setMonth(this.viewDate.getMonth() - 1);
-      this.render();
+      this.loadEvents();
     });
 
     document.getElementById('nextMonth').addEventListener('click', () => {
       this.viewDate.setMonth(this.viewDate.getMonth() + 1);
-      this.render();
+      this.loadEvents();
     });
 
     document.getElementById('todayBtn').addEventListener('click', () => {
       this.viewDate = new Date();
-      this.render();
+      this.loadEvents();
+    });
+
+    // Modal event listeners
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('taskModal').classList.add('hidden');
+    });
+
+    document.getElementById('taskModal').addEventListener('click', (e) => {
+      if (e.target.id === 'taskModal') {
+        document.getElementById('taskModal').classList.add('hidden');
+      }
     });
   }
 
-  startClock() {
-    setInterval(() => {
-      this.render();
-    }, 60000);
+  showTaskDetails(task) {
+    const modal = document.getElementById('taskModal');
+    const modalContent = document.getElementById('modal-content');
+    
+    modalContent.innerHTML = `
+      <div class="space-y-4">
+        <div>
+          <h4 class="font-medium text-gray-900">${task.title}</h4>
+          <p class="text-sm text-gray-600 mt-1">${task.description || 'No description'}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <span class="text-sm font-medium text-gray-700">Time:</span>
+            <p class="text-sm text-gray-900">${task.time}</p>
+          </div>
+          <div>
+            <span class="text-sm font-medium text-gray-700">Status:</span>
+            <p class="text-sm text-gray-900 capitalize">${task.status || 'pending'}</p>
+          </div>
+        </div>
+        <div>
+          <span class="text-sm font-medium text-gray-700">Place:</span>
+          <p class="text-sm text-gray-900">${task.place}</p>
+        </div>
+        <div>
+          <span class="text-sm font-medium text-gray-700">Implementor:</span>
+          <p class="text-sm text-gray-900">${task.implementor}</p>
+        </div>
+      </div>
+    `;
+    
+    modal.classList.remove('hidden');
   }
 
   formatMonthYear(date) {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
+  // FIX: Format date key tanpa timezone conversion
   formatDateKey(date) {
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   isToday(date) {
@@ -155,7 +239,7 @@ class RealTimeCalendar {
 
     const firstDay = new Date(year, month, 1);
     const startDay = new Date(firstDay);
-    startDay.setDate(firstDay.getDate() - firstDay.getDay()); // Mulai dari hari Minggu sebelumnya
+    startDay.setDate(firstDay.getDate() - firstDay.getDay());
 
     const days = [];
     for (let i = 0; i < 42; i++) {
@@ -164,6 +248,18 @@ class RealTimeCalendar {
     }
 
     return days;
+  }
+
+  getStatusColor(status) {
+    switch (status) {
+      case 'completed':
+        return 'text-green-600';
+      case 'cancelled':
+        return 'text-red-600';
+      case 'pending':
+      default:
+        return 'text-gray-900';
+    }
   }
 
   renderDay(date) {
@@ -183,10 +279,10 @@ class RealTimeCalendar {
         <ol class="mt-2 space-y-1">
           ${dayEvents.map(event => `
             <li>
-              <a href="#" class="group flex">
-                <p class="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">${event.title}</p>
+              <button type="button" class="group flex w-full text-left task-event" data-task='${JSON.stringify(event)}'>
+                <p class="flex-auto truncate font-medium ${this.getStatusColor(event.status || 'pending')} group-hover:text-indigo-600">${event.title}</p>
                 <time datetime="${event.datetime}" class="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block">${event.time}</time>
-              </a>
+              </button>
             </li>
           `).join('')}
         </ol>
@@ -210,6 +306,20 @@ class RealTimeCalendar {
     const days = this.generateCalendarDays();
     const calendarGrid = document.getElementById('calendar-grid');
     calendarGrid.innerHTML = days.map(day => this.renderDay(day)).join('');
+
+    // Add event listeners to task events
+    document.querySelectorAll('.task-event').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const task = JSON.parse(e.currentTarget.dataset.task);
+        this.showTaskDetails(task);
+      });
+    });
+
+    // Hide loading indicator
+    const loading = document.getElementById('loading');
+    if (loading) {
+      loading.remove();
+    }
   }
 }
 
