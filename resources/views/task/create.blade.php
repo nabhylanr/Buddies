@@ -64,44 +64,63 @@
               </div>
 
               <!-- Date -->
-<div class="col-span-full">
-  <label for="date" class="block text-sm font-medium text-gray-900">Tanggal</label>
-  <div class="mt-2">
-    <input type="date" name="date" id="date" value="{{ old('date') }}" required
-      class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
-  </div>
-</div>
-
-<!-- Time -->
-<div class="col-span-full">
-  <label for="time" class="block text-sm font-medium text-gray-900">Jam</label>
-  <div class="mt-2">
-    <select name="time" id="time" required
-      class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-      <option value="">-- Pilih Jam --</option>
-      <option value="10:00">10.00</option>
-      <option value="13:00">13.00</option>
-      <option value="15:00">15.00</option>
-    </select>
-  </div>
-</div>
-
-
-              <!-- Place -->
               <div class="col-span-full">
-                <label for="place" class="block text-sm font-medium text-gray-900">Tempat</label>
+                <label for="date" class="block text-sm font-medium text-gray-900">Tanggal</label>
                 <div class="mt-2">
-                  <input type="text" name="place" id="place" value="{{ old('place') }}" required
+                  <input type="date" name="date" id="date" value="{{ old('date') }}" required
                     class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                 </div>
               </div>
 
-              <!-- Implementor -->
+              <!-- Time -->
+              <div class="col-span-full">
+                <label for="time" class="block text-sm font-medium text-gray-900">Jam</label>
+                <div class="mt-2">
+                  <select name="time" id="time" required
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <option value="">-- Pilih Jam --</option>
+                    <option value="10:00">10.00</option>
+                    <option value="13:00">13.00</option>
+                    <option value="15:00">15.00</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Place Dropdown -->
+              <div class="col-span-full">
+                <label for="place" class="block text-sm font-medium text-gray-900">Tempat</label>
+                <div class="mt-2 relative">
+                  <select name="place" id="place" required
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10">
+                    <option value="">-- Pilih Tempat --</option>
+                    <option value="Online" {{ old('place') == 'Online' ? 'selected' : '' }}>Online</option>
+                    <option value="Offline" {{ old('place') == 'Offline' ? 'selected' : '' }}>Offline</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Implementor Dropdown -->
               <div class="col-span-full">
                 <label for="implementor" class="block text-sm font-medium text-gray-900">Implementor</label>
-                <div class="mt-2">
-                  <input type="text" name="implementor" id="implementor" value="{{ old('implementor') }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                <div class="mt-2 relative">
+                  <select name="implementor" id="implementor" required
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10">
+                    <option value="">-- Pilih Implementor --</option>
+                    <option value="Pipin" {{ old('implementor') == 'Pipin' ? 'selected' : '' }}>Pipin</option>
+                    <option value="Adit" {{ old('implementor') == 'Adit' ? 'selected' : '' }}>Adit</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
 
@@ -120,24 +139,5 @@
     </div>
   </main>
 </div>
-
-<script>
-// Set default datetime to now
-document.addEventListener('DOMContentLoaded', function() {
-  const datetimeInput = document.getElementById('datetime');
-  if (!datetimeInput.value) {
-    const now = new Date();
-    // Format datetime-local input value
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    
-    datetimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-});
-</script>
-
 </body>
 </html>
