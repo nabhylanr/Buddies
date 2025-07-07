@@ -64,12 +64,31 @@
                 </div>
               </div>
 
-              <!-- Datetime -->
+              <!-- Date -->
               <div class="col-span-full">
-                <label for="datetime" class="block text-sm font-medium text-gray-900">Waktu</label>
+                <label for="date" class="block text-sm font-medium text-gray-900">Tanggal</label>
                 <div class="mt-2">
-                  <input type="datetime-local" name="datetime" id="datetime" value="{{ old('datetime', \Carbon\Carbon::parse($task->datetime)->format('Y-m-d\TH:i')) }}" required
+                  <input type="date" name="date" id="date"
+                    value="{{ old('date', \Carbon\Carbon::parse($task->datetime)->format('Y-m-d')) }}"
+                    required
                     class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                </div>
+              </div>
+
+              <!-- Time -->
+              <div class="col-span-full">
+                <label for="time" class="block text-sm font-medium text-gray-900">Jam</label>
+                <div class="mt-2">
+                  <select name="time" id="time" required
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <option value="">-- Pilih Jam --</option>
+                    @foreach (['10:00', '13:00', '15:00'] as $hour)
+                      <option value="{{ $hour }}"
+                        {{ old('time', \Carbon\Carbon::parse($task->datetime)->format('H:i')) == $hour ? 'selected' : '' }}>
+                        {{ \Carbon\Carbon::createFromFormat('H:i', $hour)->format('H.i') }}
+                      </option>
+                    @endforeach
+                  </select>
                 </div>
               </div>
 

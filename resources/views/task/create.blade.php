@@ -63,14 +63,29 @@
                 </div>
               </div>
 
-              <!-- Datetime -->
-              <div class="col-span-full">
-                <label for="datetime" class="block text-sm font-medium text-gray-900">Waktu</label>
-                <div class="mt-2">
-                  <input type="datetime-local" name="datetime" id="datetime" value="{{ old('datetime') }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
-                </div>
-              </div>
+              <!-- Date -->
+<div class="col-span-full">
+  <label for="date" class="block text-sm font-medium text-gray-900">Tanggal</label>
+  <div class="mt-2">
+    <input type="date" name="date" id="date" value="{{ old('date') }}" required
+      class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+  </div>
+</div>
+
+<!-- Time -->
+<div class="col-span-full">
+  <label for="time" class="block text-sm font-medium text-gray-900">Jam</label>
+  <div class="mt-2">
+    <select name="time" id="time" required
+      class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+      <option value="">-- Pilih Jam --</option>
+      <option value="10:00">10.00</option>
+      <option value="13:00">13.00</option>
+      <option value="15:00">15.00</option>
+    </select>
+  </div>
+</div>
+
 
               <!-- Place -->
               <div class="col-span-full">

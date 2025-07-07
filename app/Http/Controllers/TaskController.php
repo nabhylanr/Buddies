@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -17,14 +18,22 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'datetime' => 'required|date',
+            'date' => 'required|date',
+            'time' => 'required',
             'place' => 'required|string|max:255',
             'implementor' => 'required|string|max:255',
         ]);
 
-        Task::create($request->all());
+        $datetime = Carbon::parse($request->date . ' ' . $request->time);
 
-        // Redirect ke calendar setelah berhasil create task
+        Task::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'datetime' => $datetime,
+            'place' => $request->place,
+            'implementor' => $request->implementor,
+        ]);
+
         return redirect()->route('calendar.index')
             ->with('success', 'Task berhasil ditambahkan ke calendar!');
     }
@@ -51,23 +60,31 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'datetime' => 'required|date',
+            'date' => 'required|date',
+            'time' => 'required',
             'place' => 'required|string|max:255',
             'implementor' => 'required|string|max:255',
         ]);
 
-        $task->update($request->all());
+        $datetime = Carbon::parse($request->date . ' ' . $request->time);
+
+        $task->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'datetime' => $datetime,
+            'place' => $request->place,
+            'implementor' => $request->implementor,
+        ]);
 
         return redirect()->route('calendar.index')
             ->with('success', 'Task berhasil diperbarui!');
     }
 
     public function destroy($id)
-{
-    $task = Task::findOrFail($id);
-    $task->delete();
+    {
+        $task = Task::findOrFail($id);
+        $task->delete();
 
-    return redirect()->route('tasks.index')->with('success', 'Task berhasil dihapus.');
-}
-
+        return redirect()->route('tasks.index')->with('success', 'Task berhasil dihapus.');
+    }
 }

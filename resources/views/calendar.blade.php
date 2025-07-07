@@ -51,7 +51,7 @@
                 </button>
               </div>
               <div class="ml-6 h-6 w-px bg-gray-300"></div>
-              <a href="{{ route('tasks.create') }}" class="ml-6 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Add event</a>
+              <a href="{{ route('tasks.create') }}" class="ml-6 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Add task</a>
             </div>
           </div>
         </header>
