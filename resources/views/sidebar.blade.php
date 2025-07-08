@@ -31,6 +31,8 @@
     <a href="/settings" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 hover:text-black transition">
       Settings
     </a>
+
+
   </nav>
 </div>
 </body>

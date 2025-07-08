@@ -391,8 +391,8 @@ class RealTimeCalendar {
             <p class="text-sm text-gray-900">${task.time}</p>
           </div>
           <div>
-            <span class="text-sm font-medium text-gray-700">Status:</span>
-            <p class="text-sm text-gray-900 capitalize">${task.status || 'pending'}</p>
+              <span class="text-sm font-medium text-gray-700">Status:</span>
+              <p class="text-sm text-gray-900 capitalize">${task.status || 'Uncompleted'}</p>
           </div>
         </div>
         <div>
@@ -454,7 +454,7 @@ class RealTimeCalendar {
         return 'text-green-600';
       case 'cancelled':
         return 'text-red-600';
-      case 'pending':
+      case 'uncompleted':
       default:
         return 'text-gray-900';
     }

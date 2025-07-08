@@ -25,7 +25,6 @@ class TaskController extends Controller
 
         $datetime = Carbon::parse($request->date . ' ' . $request->time);
 
-        // Validasi konflik jadwal
         $this->validateScheduleConflict($request->implementor, $datetime);
 
         Task::create([
@@ -34,6 +33,7 @@ class TaskController extends Controller
             'datetime' => $datetime,
             'place' => $request->place,
             'implementor' => $request->implementor,
+            'status' => 'pending', 
         ]);
 
         return redirect()->route('calendar.index')
@@ -42,7 +42,7 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
-        $query = Task::query();
+        $query = Task::where('status', 'pending'); 
         
         if ($request->filled('date')) {
             $query->whereDate('datetime', $request->date);
@@ -63,6 +63,51 @@ class TaskController extends Controller
         $tasks = $query->orderBy('datetime', 'asc')->get();
         
         return view('task.index', compact('tasks'));
+    }
+
+    public function history(Request $request)
+    {
+        $query = Task::where('status', 'completed'); 
+        
+        if ($request->filled('date')) {
+            $query->whereDate('datetime', $request->date);
+        }
+        
+        if ($request->filled('time')) {
+            $query->whereTime('datetime', $request->time);
+        }
+        
+        if ($request->filled('place')) {
+            $query->where('place', $request->place);
+        }
+        
+        if ($request->filled('implementor')) {
+            $query->where('implementor', $request->implementor);
+        }
+
+        $tasks = $query->orderBy('completed_at', 'desc')->get(); 
+        
+        return view('task.history', compact('tasks'));
+    }
+
+    public function complete(Task $task)
+    {
+        $task->update([
+            'status' => 'completed',
+            'completed_at' => Carbon::now('Asia/Jakarta') 
+        ]);
+
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task berhasil ditandai sebagai selesai pada ' . 
+                   Carbon::now('Asia/Jakarta')->format('d M Y H:i') . '!');
+    }
+
+    public function uncomplete(Task $task)
+    {
+        $task->markAsPending();
+
+        return redirect()->route('tasks.history')
+            ->with('success', 'Task berhasil dikembalikan ke daftar!');
     }
 
     public function show(Task $task)
@@ -89,7 +134,6 @@ class TaskController extends Controller
 
         $datetime = Carbon::parse($request->date . ' ' . $request->time);
 
-        // Validasi konflik jadwal (kecuali untuk task yang sedang diedit)
         $this->validateScheduleConflict($request->implementor, $datetime, $task->id);
 
         $task->update([
@@ -112,15 +156,12 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task berhasil dihapus.');
     }
 
-    /**
-     * Validasi konflik jadwal untuk implementor
-     */
     private function validateScheduleConflict($implementor, $datetime, $excludeTaskId = null)
     {
         $query = Task::where('implementor', $implementor)
-                    ->where('datetime', $datetime);
+                    ->where('datetime', $datetime)
+                    ->where('status', 'pending'); 
 
-        // Jika sedang update, exclude task yang sedang diedit
         if ($excludeTaskId) {
             $query->where('id', '!=', $excludeTaskId);
         }
@@ -136,25 +177,21 @@ class TaskController extends Controller
         }
     }
 
-    /**
-     * API endpoint untuk mendapatkan waktu yang tersedia untuk implementor tertentu
-     */
     public function getAvailableTimeSlots(Request $request)
     {
         $implementor = $request->get('implementor');
         $date = $request->get('date');
-        $excludeTaskId = $request->get('exclude_task_id'); // untuk edit mode
+        $excludeTaskId = $request->get('exclude_task_id'); 
 
         if (!$implementor || !$date) {
             return response()->json(['error' => 'Implementor dan tanggal harus diisi'], 400);
         }
 
-        // Daftar semua slot waktu yang tersedia
         $allTimeSlots = ['10:00', '13:00', '15:00'];
         
-        // Ambil waktu yang sudah digunakan oleh implementor pada tanggal tersebut
         $query = Task::where('implementor', $implementor)
-                    ->whereDate('datetime', $date);
+                    ->whereDate('datetime', $date)
+                    ->where('status', 'pending'); 
 
         if ($excludeTaskId) {
             $query->where('id', '!=', $excludeTaskId);
@@ -166,7 +203,6 @@ class TaskController extends Controller
                               })
                               ->toArray();
 
-        // Filter slot waktu yang masih tersedia
         $availableTimeSlots = array_diff($allTimeSlots, $usedTimeSlots);
 
         return response()->json([

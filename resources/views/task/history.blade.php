@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daftar Task</title>
+  <title>Riwayat Task</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
@@ -20,16 +20,16 @@
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h2 class="text-2xl font-bold text-gray-800">Daftar Task</h2>
-          <p class="mt-1 text-sm text-gray-600">Kelola semua task dan jadwal Anda.</p>
+          <h2 class="text-2xl font-bold text-gray-800">Riwayat Task</h2>
+          <p class="mt-1 text-sm text-gray-600">Daftar task yang telah diselesaikan.</p>
         </div>
         <div class="flex space-x-3">
-          <a href="{{ route('tasks.history') }}"
-              class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-green-600 text-white text-sm font-semibold shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+          <a href="{{ route('tasks.index') }}"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-gray-600 text-white text-sm font-semibold shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
-              Riwayat
+              Kembali ke Daftar Task
           </a>
           <a href="{{ route('tasks.create') }}"
               class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-gray-900 text-white text-sm font-semibold shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
@@ -44,7 +44,7 @@
 
       <!-- Success Message -->
       @if(session('success'))
-        <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
+        <div class="mb-4 p-3 bg-green-100 text-green-700 rounded border border-green-200">
           {{ session('success') }}
         </div>
       @endif
@@ -65,7 +65,7 @@
         <!-- Floating Panel -->
         <div x-show="open" @click.outside="open = false" x-transition
             class="absolute right-0 mt-2 w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-lg p-6 z-50">
-          <form method="GET" action="{{ route('tasks.index') }}" class="space-y-4">
+          <form method="GET" action="{{ route('tasks.history') }}" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
               <input type="date" name="date" value="{{ request('date') }}"
@@ -139,7 +139,7 @@
             </div>
 
             <div class="flex justify-between mt-4">
-              <a href="{{ route('tasks.index') }}" class="text-sm text-gray-600 hover:underline">Reset</a>
+              <a href="{{ route('tasks.history') }}" class="text-sm text-gray-600 hover:underline">Reset</a>
               <button type="submit"
                       class="px-4 py-2 bg-gray-900 text-white text-sm rounded-md shadow hover:bg-gray-700">Terapkan</button>
             </div>
@@ -150,29 +150,37 @@
       <!-- Table -->
       @if($tasks->isEmpty())
         <div class="text-center py-12">
-          <p class="text-gray-500 text-lg">Belum ada task yang tersedia</p>
-          <p class="text-gray-400 text-sm mt-2">Mulai dengan menambahkan task baru</p>
+          <div class="text-6xl text-gray-300 mb-4">✓</div>
+          <p class="text-gray-500 text-lg">Belum ada task yang diselesaikan</p>
+          <p class="text-gray-400 text-sm mt-2">Task yang sudah selesai akan muncul di sini</p>
         </div>
       @else
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table class="w-full text-sm text-left text-gray-500">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
               <tr>
+                <th class="px-6 py-3">Status</th>
                 <th class="px-6 py-3">Judul</th>
                 <th class="px-6 py-3">Tanggal</th>
                 <th class="px-6 py-3">Jam</th>
                 <th class="px-6 py-3">Tempat</th>
                 <th class="px-6 py-3">Implementor</th>
+                <th class="px-6 py-3">Selesai pada</th>
                 <th class="px-6 py-3">Aksi</th>
-                <th class="px-6 py-3 text-center">Status</th>
               </tr>
             </thead>
             <tbody>
               @foreach($tasks as $task)
                 <tr class="bg-white border-b hover:bg-gray-50">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <span class="text-green-600 text-xl mr-2">✓</span>
+                      <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-sm">Selesai</span>
+                    </div>
+                  </td>
                   <td class="px-6 py-4 font-medium text-gray-900">{{ $task->title }}</td>
-                  <td class="px-6 py-4">{{ \Carbon\Carbon::parse($task->datetime)->format('d M Y') }}</td>
-                  <td class="px-6 py-4">{{ \Carbon\Carbon::parse($task->datetime)->format('H:i') }}</td>
+                  <td class="px-6 py-4">{{ $task->formatted_date }}</td>
+                  <td class="px-6 py-4">{{ $task->formatted_time }}</td>
                   <td class="px-6 py-4">{{ $task->place }}</td>
                   <td class="px-6 py-4">
                     @if($task->implementor === 'Pipin')
@@ -183,27 +191,32 @@
                       <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-sm">{{ $task->implementor }}</span>
                     @endif
                   </td>
-                  <td class="px-6 py-4 flex space-x-2">
-                    <a href="{{ route('tasks.edit', $task->id) }}"
-                       class="text-yellow-600 hover:text-yellow-800 font-medium text-sm">Edit</a>
-                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus task ini?')">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm">Hapus</button>
-                    </form>
+                  <td class="px-6 py-4 text-sm text-gray-600">
+                    {{-- Menggunakan accessor dari model yang sudah menghandle timezone --}}
+                    <div class="flex flex-col">
+                      <span class="font-medium">{{ $task->formatted_completed_at }}</span>
+                      @if($task->completed_at_relative)
+                        <span class="text-xs text-gray-400">
+                          ({{ $task->completed_at_relative }})
+                        </span>
+                      @endif
+                    </div>
                   </td>
-                  <td class="px-6 py-4 text-center">
-                    <form action="{{ route('tasks.complete', $task->id) }}" method="POST" class="inline">
+                  <td class="px-6 py-4 flex space-x-2">
+                    <form action="{{ route('tasks.uncomplete', $task->id) }}" method="POST" class="inline">
                       @csrf
                       @method('PATCH')
                       <button type="submit" 
-                              class="inline-flex items-center justify-center w-6 h-6 rounded-full border-2 border-green-500 bg-white hover:bg-green-500 hover:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 group"
-                              onclick="return confirm('Tandai task ini sebagai selesai?')"
-                              title="Tandai selesai">
-                        <svg class="w-4 h-4 text-green-500 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
+                              class="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200"
+                              onclick="return confirm('Kembalikan task ini ke daftar pending?')"
+                              title="Kembalikan ke pending">
+                        Batal Selesai
                       </button>
+                    </form>
+                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus task ini?')">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm transition-colors duration-200">Hapus</button>
                     </form>
                   </td>
                 </tr>
