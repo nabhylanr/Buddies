@@ -17,7 +17,7 @@
   <!-- Main Content -->
   <main class="flex-1 overflow-y-auto p-10">
     <div class="bg-white p-8 rounded-xl shadow-xl border border-gray-100">
-      <h2 class="text-2xl font-bold mb-6">Tambah Task Baru</h2>
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Tambah Task Baru</h2>
 
       @if(session('success'))
         <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
@@ -50,7 +50,7 @@
                 <label for="title" class="block text-sm font-medium text-gray-900">Judul Task</label>
                 <div class="mt-2">
                   <input type="text" name="title" id="title" value="{{ old('title') }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" />
                 </div>
               </div>
 
@@ -59,7 +59,7 @@
                 <label for="description" class="block text-sm font-medium text-gray-900">Deskripsi</label>
                 <div class="mt-2">
                   <textarea name="description" id="description" rows="4" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">{{ old('description') }}</textarea>
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none">{{ old('description') }}</textarea>
                 </div>
               </div>
 
@@ -68,7 +68,7 @@
                 <label for="date" class="block text-sm font-medium text-gray-900">Tanggal</label>
                 <div class="mt-2">
                   <input type="date" name="date" id="date" value="{{ old('date') }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" />
                 </div>
               </div>
 
@@ -77,7 +77,7 @@
                 <label for="time" class="block text-sm font-medium text-gray-900">Jam</label>
                 <div class="mt-2 relative">
                   <select name="time" id="time" required
-                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10">
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
                     <option value="">Jam</option>
                     <option value="10:00">10.00</option>
                     <option value="13:00">13.00</option>
@@ -97,7 +97,7 @@
                 <label for="place" class="block text-sm font-medium text-gray-900">Tempat</label>
                 <div class="mt-2 relative">
                   <select name="place" id="place" required
-                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10">
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
                     <option value="">Tempat</option>
                     <option value="Online" {{ old('place') == 'Online' ? 'selected' : '' }}>Online</option>
                     <option value="Offline" {{ old('place') == 'Offline' ? 'selected' : '' }}>Offline</option>
@@ -116,7 +116,7 @@
                 <label for="implementor" class="block text-sm font-medium text-gray-900">Implementor</label>
                 <div class="mt-2 relative">
                   <select name="implementor" id="implementor" required
-                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10">
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
                     <option value="">Implementor</option>
                     <option value="Pipin" {{ old('implementor') == 'Pipin' ? 'selected' : '' }}>Pipin</option>
                     <option value="Adit" {{ old('implementor') == 'Adit' ? 'selected' : '' }}>Adit</option>
@@ -137,7 +137,7 @@
         <div class="mt-6 flex items-center justify-end gap-x-6">
           <a href="{{ route('tasks.index') }}" class="text-sm font-semibold text-gray-700 hover:underline">Kembali</a>
           <button type="submit"
-            class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600">
+            class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-gray-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gray-700">
             Simpan Task
           </button>
         </div>

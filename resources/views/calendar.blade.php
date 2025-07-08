@@ -51,10 +51,24 @@
                 </button>
               </div>
               <div class="ml-6 h-6 w-px bg-gray-300"></div>
-              <a href="{{ route('tasks.create') }}" class="ml-6 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Add task</a>
+              <a href="{{ route('tasks.create') }}"
+                class="ml-6 rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700">
+                Add event
+              </a>
             </div>
           </div>
         </header>
+
+        <!-- Legend -->
+        <div class="bg-white px-6 py-2 border-b border-gray-200">
+          <div class="flex items-center gap-4 text-sm">
+            <span class="text-gray-700 font-medium">Legend:</span>
+            <div class="flex items-center gap-2">
+              <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-sm">Adit</span>
+              <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-sm">Pipin</span>
+            </div>
+          </div>
+        </div>
 
         <div class="shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col">
           <div class="grid grid-cols-7 gap-px border-b border-gray-300 bg-gray-200 text-center text-xs font-semibold leading-6 text-gray-700">
@@ -68,7 +82,7 @@
           </div>
 
           <div class="flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto">
-            <div class="w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px" id="calendar-grid">
+            <div class="w-full lg:grid lg:grid-cols-7 lg:gap-px" id="calendar-grid">
               <!-- Loading indicator -->
               <div id="loading" class="col-span-7 flex items-center justify-center h-64">
                 <div class="text-gray-500">Loading calendar...</div>
@@ -97,7 +111,8 @@
           </div>
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button type="button" id="closeModal" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+          <button type="button" id="closeModal"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-900 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:ml-3 sm:w-auto sm:text-sm">
             Close
           </button>
         </div>
@@ -203,7 +218,9 @@ class RealTimeCalendar {
         </div>
         <div>
           <span class="text-sm font-medium text-gray-700">Implementor:</span>
-          <p class="text-sm text-gray-900">${task.implementor}</p>
+          <p class="text-sm text-gray-900">
+            <span class="${this.getImplementorBadgeClass(task.implementor)}">${task.implementor}</span>
+          </p>
         </div>
       </div>
     `;
@@ -262,6 +279,39 @@ class RealTimeCalendar {
     }
   }
 
+  // NEW: Function to get implementor color classes
+  getImplementorColor(implementor) {
+    const normalizedName = implementor.toLowerCase();
+    switch (normalizedName) {
+      case 'adit':
+        return {
+          bg: 'bg-yellow-100',
+          text: 'text-yellow-800',
+          border: 'border-yellow-200',
+          hover: 'hover:bg-yellow-200'
+        };
+      case 'pipin':
+        return {
+          bg: 'bg-purple-100',
+          text: 'text-purple-800',
+          border: 'border-purple-200',
+          hover: 'hover:bg-purple-200'
+        };
+      default:
+        return {
+          bg: 'bg-gray-100',
+          text: 'text-gray-800',
+          border: 'border-gray-200',
+          hover: 'hover:bg-gray-200'
+        };
+    }
+  }
+
+  getImplementorBadgeClass(implementor) {
+    const colors = this.getImplementorColor(implementor);
+    return `${colors.bg} ${colors.text} text-xs font-medium px-2.5 py-0.5 rounded-sm`;
+  }
+
   renderDay(date) {
     const isCurrentMonth = this.isCurrentMonth(date);
     const isToday = this.isToday(date);
@@ -270,33 +320,82 @@ class RealTimeCalendar {
 
     const bgClass = isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400';
     const dateClass = isToday
-      ? 'flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white'
+      ? 'flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 font-semibold text-white'
       : '';
 
+    // Calculate minimum height based on number of events
+    const minHeight = Math.max(96, 32 + (dayEvents.length * 20)); // 32px for date + 20px per event
+    
     let eventsHtml = '';
     if (dayEvents.length > 0) {
+      // Show first 3 events normally
+      const visibleEvents = dayEvents.slice(0, 3);
+      const hiddenCount = dayEvents.length - 3;
+      
       eventsHtml = `
-        <ol class="mt-2 space-y-1">
-          ${dayEvents.map(event => `
+        <ol class="mt-1 space-y-0.5">
+          ${visibleEvents.map(event => {
+            const colors = this.getImplementorColor(event.implementor);
+            return `
+              <li>
+                <button type="button" class="group flex w-full text-left task-event rounded px-1 py-0.5 ${colors.bg} ${colors.border} border ${colors.hover}" data-task='${JSON.stringify(event)}'>
+                  <p class="flex-auto truncate text-xs font-medium ${colors.text} group-hover:opacity-80">${event.title}</p>
+                  <time datetime="${event.datetime}" class="ml-1 hidden flex-none text-xs ${colors.text} group-hover:opacity-80 xl:block">${event.time}</time>
+                </button>
+              </li>
+            `;
+          }).join('')}
+          ${hiddenCount > 0 ? `
             <li>
-              <button type="button" class="group flex w-full text-left task-event" data-task='${JSON.stringify(event)}'>
-                <p class="flex-auto truncate font-medium ${this.getStatusColor(event.status || 'pending')} group-hover:text-indigo-600">${event.title}</p>
-                <time datetime="${event.datetime}" class="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block">${event.time}</time>
+              <button type="button" class="w-full text-left text-xs text-gray-500 hover:text-gray-700 px-1 py-0.5 more-events" data-date="${dateKey}">
+                +${hiddenCount} more
               </button>
             </li>
-          `).join('')}
+          ` : ''}
         </ol>
       `;
     }
 
     return `
-      <div class="relative ${bgClass} px-3 py-2 h-24 flex flex-col">
-        <time datetime="${dateKey}" class="${dateClass}">${date.getDate()}</time>
-        <div class="flex-1 overflow-hidden">
+      <div class="relative ${bgClass} px-2 py-2 flex flex-col border-b border-gray-100" style="min-height: ${minHeight}px;">
+        <time datetime="${dateKey}" class="${dateClass} mb-1">${date.getDate()}</time>
+        <div class="flex-1">
           ${eventsHtml}
         </div>
       </div>
     `;
+  }
+
+  showMoreEvents(dateKey) {
+    const dayEvents = this.events[dateKey] || [];
+    const modal = document.getElementById('taskModal');
+    const modalContent = document.getElementById('modal-content');
+    
+    modalContent.innerHTML = `
+      <div class="space-y-3">
+        <h4 class="font-medium text-gray-900">Events for ${dateKey}</h4>
+        <div class="space-y-2 max-h-96 overflow-y-auto">
+          ${dayEvents.map(event => {
+            const colors = this.getImplementorColor(event.implementor);
+            return `
+              <div class="border rounded-lg p-3 ${colors.hover} cursor-pointer task-event ${colors.bg} ${colors.border}" data-task='${JSON.stringify(event)}'>
+                <div class="flex justify-between items-start">
+                  <h5 class="font-medium ${colors.text}">${event.title}</h5>
+                  <span class="text-xs ${colors.text} opacity-75">${event.time}</span>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">${event.description || 'No description'}</p>
+                <div class="flex gap-4 mt-2 text-xs text-gray-500">
+                  <span>📍 ${event.place}</span>
+                  <span class="${this.getImplementorBadgeClass(event.implementor)}">👤 ${event.implementor}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+    
+    modal.classList.remove('hidden');
   }
 
   render() {
@@ -312,6 +411,14 @@ class RealTimeCalendar {
       button.addEventListener('click', (e) => {
         const task = JSON.parse(e.currentTarget.dataset.task);
         this.showTaskDetails(task);
+      });
+    });
+
+    // Add event listeners to "more events" buttons
+    document.querySelectorAll('.more-events').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const dateKey = e.currentTarget.dataset.date;
+        this.showMoreEvents(dateKey);
       });
     });
 
