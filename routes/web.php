@@ -24,5 +24,7 @@ Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.crea
 Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
 Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 Route::resource('tasks', TaskController::class);
+Route::get('/api/tasks/available-time-slots', [TaskController::class, 'getAvailableTimeSlots']);
+
 
 

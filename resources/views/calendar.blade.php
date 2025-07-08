@@ -6,11 +6,30 @@
   <title>Calendar Dashboard</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom styles for dropdown animation */
+    .dropdown-menu {
+      transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+      opacity: 0;
+      transform: translateY(-8px) scale(0.95);
+      pointer-events: none; /* Prevents interaction when hidden */
+    }
+    .dropdown-menu.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto; /* Allows interaction when shown */
+    }
+
+    .dropdown-arrow-rotate {
+      transform: rotate(180deg);
+    }
+  </style>
 </head>
 <body class="bg-gray-50 h-screen">
 
   <div class="flex h-full">
     <div class="w-64 bg-white border-r border-gray-200">
+      {{-- Assuming sidebar content is handled by @include('sidebar') --}}
       @include('sidebar')
     </div>
 
@@ -22,18 +41,15 @@
           </h1>
           <div class="flex items-center">
             <div class="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch">
-              <!-- Prev Month Button -->
-              <button type="button" id="prevMonth" class="flex h-9 w-12 items-center justify-center rounded-l-md border-y border-l border-gray-300 pr-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pr-0 md:hover:bg-gray-50">
+              <button type="button" id="prevMonth" class="flex h-9 w-12 items-center justify-center rounded-l-md border-y border-l border-gray-300 pr-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pr-0 md:hover:bg-gray-50 transition-colors">
                 <span class="sr-only">Previous month</span>
                 <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
                 </svg>
               </button>
-              <!-- Today Button -->
-              <button type="button" id="todayBtn" class="hidden border-y border-gray-300 px-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:relative md:block">Today</button>
+              <button type="button" id="todayBtn" class="hidden border-y border-gray-300 px-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:relative md:block transition-colors">Month</button>
               <span class="relative -mx-px h-5 w-px bg-gray-300 md:hidden"></span>
-              <!-- Next Month Button -->
-              <button type="button" id="nextMonth" class="flex h-9 w-12 items-center justify-center rounded-r-md border-y border-r border-gray-300 pl-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pl-0 md:hover:bg-gray-50">
+              <button type="button" id="nextMonth" class="flex h-9 w-12 items-center justify-center rounded-r-md border-y border-r border-gray-300 pl-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pl-0 md:hover:bg-gray-50 transition-colors">
                 <span class="sr-only">Next month</span>
                 <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
@@ -43,26 +59,62 @@
 
             <div class="hidden md:ml-4 md:flex md:items-center">
               <div class="relative">
-                <button type="button" class="flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" id="menu-button" aria-expanded="false" aria-haspopup="true">
-                  Month view
-                  <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <button type="button" class="flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors" id="menu-button" aria-expanded="false" aria-haspopup="true">
+                  <span id="current-view">Month view</span>
+                  <svg class="-mr-1 h-5 w-5 text-gray-400 transition-transform duration-200" id="dropdown-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                   </svg>
                 </button>
+
+                <div id="dropdown-menu" class="dropdown-menu absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                  <div class="py-1" role="none">
+                    <div class="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      Quick Navigation
+                    </div>
+                    <div class="grid grid-cols-3 gap-1 p-2" id="month-grid">
+                      </div>
+                    
+                    <div class="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider border-t border-b border-gray-100">
+                      Year
+                    </div>
+                    <div class="flex items-center justify-between px-4 py-2">
+                      <button type="button" id="prevYear" class="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-50 transition-colors">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                      </button>
+                      <span class="text-sm font-medium text-gray-900" id="current-year">2024</span>
+                      <button type="button" id="nextYear" class="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-50 transition-colors">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div class="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider border-t border-b border-gray-100">
+                      Quick Actions
+                    </div>
+                    <button type="button" id="goToToday" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">
+                      <svg class="mr-3 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 0 002 2z"></path>
+                      </svg>
+                      Go to Today
+                    </button>
+                  </div>
+                </div>
               </div>
               <div class="ml-6 h-6 w-px bg-gray-300"></div>
               <a href="{{ route('tasks.create') }}"
-                class="ml-6 rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700">
-                Add event
+                class="ml-6 rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 transition-colors">
+                Add Task
               </a>
             </div>
           </div>
         </header>
 
-        <!-- Legend -->
         <div class="bg-white px-6 py-2 border-b border-gray-200">
           <div class="flex items-center gap-4 text-sm">
-            <span class="text-gray-700 font-medium">Legend:</span>
+            <span class="text-gray-700 font-medium">Implementor:</span>
             <div class="flex items-center gap-2">
               <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-sm">Adit</span>
               <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-sm">Pipin</span>
@@ -83,7 +135,6 @@
 
           <div class="flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto">
             <div class="w-full lg:grid lg:grid-cols-7 lg:gap-px" id="calendar-grid">
-              <!-- Loading indicator -->
               <div id="loading" class="col-span-7 flex items-center justify-center h-64">
                 <div class="text-gray-500">Loading calendar...</div>
               </div>
@@ -94,7 +145,6 @@
     </div>
   </div>
 
-  <!-- Task Detail Modal -->
   <div id="taskModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
@@ -105,8 +155,7 @@
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
               <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Task Details</h3>
               <div class="mt-2" id="modal-content">
-                <!-- Task details will be inserted here -->
-              </div>
+                </div>
             </div>
           </div>
         </div>
@@ -123,16 +172,27 @@
 <script>
 class RealTimeCalendar {
   constructor() {
-    this.viewDate = new Date();
-    this.events = {};
+    this.viewDate = new Date(); // The date currently being viewed in the calendar
+    this.events = {}; // Store events fetched from the server
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    this.monthNames = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
     this.init();
   }
 
   init() {
     this.setupEventListeners();
-    this.render();
-    this.loadEvents();
+    this.updateDropdownContent(); // Populate dropdown when initialized
+    this.loadEventsAndRender(); // Load events and render the calendar initially
+  }
+
+  // Combines loading events and rendering the calendar
+  async loadEventsAndRender() {
+    this.render(); // Render calendar structure first (with loading)
+    await this.loadEvents(); // Then load actual events
+    this.render(); // Re-render with events
   }
 
   async loadEvents() {
@@ -140,7 +200,6 @@ class RealTimeCalendar {
       const start = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 1);
       const end = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() + 1, 0);
       
-      // FIX: Format tanggal dengan benar tanpa timezone shift
       const formatDate = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -157,30 +216,85 @@ class RealTimeCalendar {
       
       if (response.ok) {
         this.events = await response.json();
-        this.render();
+      } else {
+        console.error('Failed to load events:', response.statusText);
+        this.events = {}; // Clear events on error
       }
     } catch (error) {
       console.error('Error loading events:', error);
+      this.events = {}; // Clear events on error
     }
   }
 
   setupEventListeners() {
+    // Month navigation buttons
     document.getElementById('prevMonth').addEventListener('click', () => {
       this.viewDate.setMonth(this.viewDate.getMonth() - 1);
-      this.loadEvents();
+      this.loadEventsAndRender();
+      this.updateDropdownContent(); // Keep dropdown in sync
     });
 
     document.getElementById('nextMonth').addEventListener('click', () => {
       this.viewDate.setMonth(this.viewDate.getMonth() + 1);
-      this.loadEvents();
+      this.loadEventsAndRender();
+      this.updateDropdownContent(); // Keep dropdown in sync
     });
 
     document.getElementById('todayBtn').addEventListener('click', () => {
       this.viewDate = new Date();
-      this.loadEvents();
+      this.loadEventsAndRender();
+      this.updateDropdownContent(); // Keep dropdown in sync
     });
 
-    // Modal event listeners
+    // --- Dropdown functionality ---
+    const menuButton = document.getElementById('menu-button');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const dropdownArrow = document.getElementById('dropdown-arrow');
+
+    // Toggle dropdown visibility
+    menuButton.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent document click from closing it immediately
+      if (dropdownMenu.classList.contains('show')) {
+        this.closeDropdown();
+      } else {
+        this.openDropdown();
+      }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        this.closeDropdown();
+      }
+    });
+
+    // Year navigation inside dropdown
+    document.getElementById('prevYear').addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent closing dropdown
+      this.viewDate.setFullYear(this.viewDate.getFullYear() - 1);
+      this.loadEventsAndRender(); // <--- ADDED THIS LINE
+      this.updateDropdownContent();
+    });
+
+    document.getElementById('nextYear').addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent closing dropdown
+      this.viewDate.setFullYear(this.viewDate.getFullYear() + 1);
+      this.loadEventsAndRender(); // <--- ADDED THIS LINE
+      this.updateDropdownContent();
+    });
+
+    // Quick actions inside dropdown
+    document.getElementById('goToToday').addEventListener('click', (e) => {
+      e.preventDefault(); 
+      this.viewDate = new Date();
+      this.loadEventsAndRender();
+      this.updateDropdownContent();
+      this.closeDropdown();
+    });
+
+    
+
+    // Modal event listeners (already present)
     document.getElementById('closeModal').addEventListener('click', () => {
       document.getElementById('taskModal').classList.add('hidden');
     });
@@ -189,6 +303,75 @@ class RealTimeCalendar {
       if (e.target.id === 'taskModal') {
         document.getElementById('taskModal').classList.add('hidden');
       }
+    });
+  }
+
+  openDropdown() {
+    const dropdown = document.getElementById('dropdown-menu');
+    const arrow = document.getElementById('dropdown-arrow');
+    
+    dropdown.classList.remove('hidden');
+    dropdown.classList.add('dropdown-menu', 'show'); // Add 'show' class for animation
+    arrow.classList.add('dropdown-arrow-rotate');
+    document.getElementById('menu-button').setAttribute('aria-expanded', 'true');
+  }
+
+  closeDropdown() {
+    const dropdown = document.getElementById('dropdown-menu');
+    const arrow = document.getElementById('dropdown-arrow');
+    
+    dropdown.classList.remove('show'); // Remove 'show' class to trigger exit animation
+    arrow.classList.remove('dropdown-arrow-rotate');
+    document.getElementById('menu-button').setAttribute('aria-expanded', 'false');
+
+    // Hide fully after animation
+    setTimeout(() => {
+      dropdown.classList.add('hidden');
+    }, 150); // Match this timeout to your CSS transition duration
+  }
+
+  updateDropdownContent() {
+    // Update current year display
+    document.getElementById('current-year').textContent = this.viewDate.getFullYear();
+    
+    // Update month grid
+    const monthGrid = document.getElementById('month-grid');
+    const currentMonthInView = this.viewDate.getMonth();
+    const currentYearInView = this.viewDate.getFullYear();
+    const today = new Date();
+    
+    monthGrid.innerHTML = this.monthNames.map((month, index) => {
+      const isActiveMonth = index === currentMonthInView;
+      const isTodayMonth = index === today.getMonth() && currentYearInView === today.getFullYear();
+      
+      let buttonClass = 'px-2 py-1 text-xs rounded-md transition-colors ';
+      if (isActiveMonth) {
+        buttonClass += 'bg-gray-900 text-white';
+      } else if (isTodayMonth) {
+        buttonClass += 'bg-blue-50 text-blue-600 hover:bg-blue-100';
+      } else {
+        buttonClass += 'text-gray-700 hover:bg-gray-100';
+      }
+      
+      return `
+        <button type="button" 
+                class="${buttonClass}" 
+                data-month="${index}"
+                title="${month} ${currentYearInView}">
+          ${month.substring(0, 3)}
+        </button>
+      `;
+    }).join('');
+    
+    // Add event listeners to month buttons within the dropdown
+    monthGrid.querySelectorAll('button').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const monthIndex = parseInt(e.target.dataset.month);
+        this.viewDate.setMonth(monthIndex); 
+        this.loadEventsAndRender(); // <--- Crucial: Re-render the main calendar with new month/year
+        this.updateDropdownContent(); // Update dropdown state (e.g., active month styling)
+        this.closeDropdown(); // Close dropdown after selection
+      });
     });
   }
 
@@ -232,7 +415,6 @@ class RealTimeCalendar {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
-  // FIX: Format date key tanpa timezone conversion
   formatDateKey(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -263,7 +445,6 @@ class RealTimeCalendar {
       days.push(new Date(startDay));
       startDay.setDate(startDay.getDate() + 1);
     }
-
     return days;
   }
 
@@ -279,7 +460,6 @@ class RealTimeCalendar {
     }
   }
 
-  // NEW: Function to get implementor color classes
   getImplementorColor(implementor) {
     const normalizedName = implementor.toLowerCase();
     switch (normalizedName) {
@@ -323,12 +503,10 @@ class RealTimeCalendar {
       ? 'flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 font-semibold text-white'
       : '';
 
-    // Calculate minimum height based on number of events
-    const minHeight = Math.max(96, 32 + (dayEvents.length * 20)); // 32px for date + 20px per event
+    const minHeight = Math.max(96, 32 + (dayEvents.length * 20)); 
     
     let eventsHtml = '';
     if (dayEvents.length > 0) {
-      // Show first 3 events normally
       const visibleEvents = dayEvents.slice(0, 3);
       const hiddenCount = dayEvents.length - 3;
       
@@ -399,9 +577,8 @@ class RealTimeCalendar {
   }
 
   render() {
-    document.getElementById('headerDate').textContent = this.formatMonthYear(this.viewDate);
-    document.getElementById('headerDate').setAttribute('datetime', this.viewDate.toISOString().slice(0, 7));
-
+    this.updateHeaderDate(); 
+    
     const days = this.generateCalendarDays();
     const calendarGrid = document.getElementById('calendar-grid');
     calendarGrid.innerHTML = days.map(day => this.renderDay(day)).join('');
@@ -422,11 +599,20 @@ class RealTimeCalendar {
       });
     });
 
-    // Hide loading indicator
+    // Remove loading indicator if present
     const loading = document.getElementById('loading');
     if (loading) {
       loading.remove();
     }
+  }
+
+  updateHeaderDate() {
+    const headerDate = document.getElementById('headerDate');
+    headerDate.textContent = this.viewDate.toLocaleDateString('en-US', { 
+      month: 'long', 
+      year: 'numeric' 
+    });
+    headerDate.setAttribute('datetime', this.viewDate.toISOString().slice(0, 7));
   }
 }
 

@@ -16,7 +16,7 @@
 
   <!-- Main Content -->
   <main class="flex-1 overflow-y-auto p-10">
-    <div class="bg-white p-6 rounded-lg shadow border border-gray-100">
+    <div class="bg-white p-8 rounded-xl shadow-xl border border-gray-100">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Task</h2>
 
       @if(session('success'))
@@ -45,12 +45,13 @@
             <p class="mt-1 text-sm text-gray-600">Perbarui detail task.</p>
 
             <div class="mt-10 grid grid-cols-1 gap-y-8">
+
               <!-- Title -->
               <div class="col-span-full">
                 <label for="title" class="block text-sm font-medium text-gray-900">Judul Task</label>
                 <div class="mt-2">
                   <input type="text" name="title" id="title" value="{{ old('title', $task->title) }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-700 focus:outline-none" />
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" />
                 </div>
               </div>
 
@@ -59,7 +60,26 @@
                 <label for="description" class="block text-sm font-medium text-gray-900">Deskripsi</label>
                 <div class="mt-2">
                   <textarea name="description" id="description" rows="4" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-700 focus:outline-none">{{ old('description', $task->description) }}</textarea>
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none">{{ old('description', $task->description) }}</textarea>
+                </div>
+              </div>
+
+              <!-- Implementor Dropdown -->
+              <div class="col-span-full">
+                <label for="implementor" class="block text-sm font-medium text-gray-900">Implementor</label>
+                <div class="mt-2 relative">
+                  <select name="implementor" id="implementor" required
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
+                    <option value="">Pilih Implementor</option>
+                    <option value="Pipin" {{ old('implementor', $task->implementor) == 'Pipin' ? 'selected' : '' }}>Pipin</option>
+                    <option value="Adit" {{ old('implementor', $task->implementor) == 'Adit' ? 'selected' : '' }}>Adit</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
 
@@ -70,7 +90,7 @@
                   <input type="date" name="date" id="date"
                     value="{{ old('date', \Carbon\Carbon::parse($task->datetime)->format('Y-m-d')) }}"
                     required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-700 focus:outline-none" />
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" />
                 </div>
               </div>
 
@@ -79,14 +99,11 @@
                 <label for="time" class="block text-sm font-medium text-gray-900">Jam</label>
                 <div class="mt-2 relative">
                   <select name="time" id="time" required
-                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-700 focus:outline-none pr-10">
-                    <option value="">Jam</option>
-                    @foreach (['10:00', '13:00', '15:00'] as $hour)
-                      <option value="{{ $hour }}"
-                        {{ old('time', \Carbon\Carbon::parse($task->datetime)->format('H:i')) == $hour ? 'selected' : '' }}>
-                        {{ \Carbon\Carbon::createFromFormat('H:i', $hour)->format('H.i') }}
-                      </option>
-                    @endforeach
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
+                    <option value="">Pilih Jam</option>
+                    <option value="10:00" {{ old('time', \Carbon\Carbon::parse($task->datetime)->format('H:i')) == '10:00' ? 'selected' : '' }}>10.00</option>
+                    <option value="13:00" {{ old('time', \Carbon\Carbon::parse($task->datetime)->format('H:i')) == '13:00' ? 'selected' : '' }}>13.00</option>
+                    <option value="15:00" {{ old('time', \Carbon\Carbon::parse($task->datetime)->format('H:i')) == '15:00' ? 'selected' : '' }}>15.00</option>
                   </select>
                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
@@ -95,6 +112,7 @@
                     </svg>
                   </div>
                 </div>
+                <div id="time-conflict-message" class="mt-2 text-sm text-red-600 hidden"></div>
               </div>
 
               <!-- Place Dropdown -->
@@ -102,29 +120,10 @@
                 <label for="place" class="block text-sm font-medium text-gray-900">Tempat</label>
                 <div class="mt-2 relative">
                   <select name="place" id="place" required
-                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-700 focus:outline-none pr-10">
-                    <option value="">Tempat</option>
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
+                    <option value="">Pilih Tempat</option>
                     <option value="Online" {{ old('place', $task->place) == 'Online' ? 'selected' : '' }}>Online</option>
                     <option value="Offline" {{ old('place', $task->place) == 'Offline' ? 'selected' : '' }}>Offline</option>
-                  </select>
-                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Implementor Dropdown -->
-              <div class="col-span-full">
-                <label for="implementor" class="block text-sm font-medium text-gray-900">Implementor</label>
-                <div class="mt-2 relative">
-                  <select name="implementor" id="implementor" required
-                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-700 focus:outline-none pr-10">
-                    <option value="">Implementor</option>
-                    <option value="Pipin" {{ old('implementor', $task->implementor) == 'Pipin' ? 'selected' : '' }}>Pipin</option>
-                    <option value="Adit" {{ old('implementor', $task->implementor) == 'Adit' ? 'selected' : '' }}>Adit</option>
                   </select>
                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
@@ -141,7 +140,7 @@
 
         <div class="mt-6 flex items-center justify-end gap-x-6">
           <a href="{{ route('tasks.index') }}" class="text-sm font-semibold text-gray-700 hover:underline">Kembali</a>
-          <button type="submit"
+          <button type="submit" id="submit-btn"
             class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-gray-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gray-700">
             Update Task
           </button>
@@ -150,6 +149,125 @@
     </div>
   </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const implementorSelect = document.getElementById('implementor');
+    const dateInput = document.getElementById('date');
+    const timeSelect = document.getElementById('time');
+    const timeConflictMessage = document.getElementById('time-conflict-message');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    // Store current task ID for exclusion in availability check
+    const currentTaskId = {{ $task->id }};
+
+    // Function to check available time slots
+    function checkAvailableTimeSlots() {
+        const implementor = implementorSelect.value;
+        const date = dateInput.value;
+
+        if (!implementor || !date) {
+            resetTimeOptions();
+            return;
+        }
+
+        // Show loading state
+        timeSelect.disabled = true;
+        timeSelect.innerHTML = '<option value="">Mengecek ketersediaan...</option>';
+
+        // Make API call to check available slots (exclude current task)
+        fetch(`/api/tasks/available-time-slots?implementor=${implementor}&date=${date}&exclude_task_id=${currentTaskId}`)
+            .then(response => response.json())
+            .then(data => {
+                updateTimeOptions(data.available_slots, data.used_slots);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resetTimeOptions();
+            })
+            .finally(() => {
+                timeSelect.disabled = false;
+            });
+    }
+
+    // Function to update time options based on availability
+    function updateTimeOptions(availableSlots, usedSlots) {
+        const allSlots = [
+            { value: '10:00', text: '10.00' },
+            { value: '13:00', text: '13.00' },
+            { value: '15:00', text: '15.00' }
+        ];
+
+        const currentSelectedTime = '{{ old("time", \Carbon\Carbon::parse($task->datetime)->format("H:i")) }}';
+        
+        timeSelect.innerHTML = '<option value="">Pilih Jam</option>';
+        
+        allSlots.forEach(slot => {
+            const option = document.createElement('option');
+            option.value = slot.value;
+            option.textContent = slot.text;
+            
+            // Select the current time
+            if (slot.value === currentSelectedTime) {
+                option.selected = true;
+            }
+            
+            if (usedSlots.includes(slot.value)) {
+                option.disabled = true;
+                option.textContent += ' (Tidak tersedia)';
+                option.style.color = '#9CA3AF';
+            }
+            
+            timeSelect.appendChild(option);
+        });
+
+        // Show message if no slots available
+        if (availableSlots.length === 0) {
+            timeConflictMessage.textContent = `Semua slot waktu untuk ${implementorSelect.value} pada tanggal ${dateInput.value} sudah terisi.`;
+            timeConflictMessage.classList.remove('hidden');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            timeConflictMessage.classList.add('hidden');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
+    // Function to reset time options to default
+    function resetTimeOptions() {
+        const currentSelectedTime = '{{ old("time", \Carbon\Carbon::parse($task->datetime)->format("H:i")) }}';
+        
+        timeSelect.innerHTML = `
+            <option value="">Pilih Jam</option>
+            <option value="10:00" ${currentSelectedTime === '10:00' ? 'selected' : ''}>10.00</option>
+            <option value="13:00" ${currentSelectedTime === '13:00' ? 'selected' : ''}>13.00</option>
+            <option value="15:00" ${currentSelectedTime === '15:00' ? 'selected' : ''}>15.00</option>
+        `;
+        timeConflictMessage.classList.add('hidden');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    // Event listeners
+    implementorSelect.addEventListener('change', checkAvailableTimeSlots);
+    dateInput.addEventListener('change', checkAvailableTimeSlots);
+
+    // Form submission validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const selectedTime = timeSelect.value;
+        const selectedOption = timeSelect.querySelector(`option[value="${selectedTime}"]`);
+        
+        if (selectedOption && selectedOption.disabled) {
+            e.preventDefault();
+            alert('Waktu yang dipilih tidak tersedia. Silakan pilih waktu lain.');
+        }
+    });
+
+    // Initial check on page load
+    checkAvailableTimeSlots();
+});
+</script>
 
 </body>
 </html>
