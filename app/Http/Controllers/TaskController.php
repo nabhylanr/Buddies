@@ -38,9 +38,28 @@ class TaskController extends Controller
             ->with('success', 'Task berhasil ditambahkan ke calendar!');
     }
 
-    public function index() 
+    public function index(Request $request)
     {
-        $tasks = Task::orderBy('datetime', 'asc')->get();
+        $query = Task::query();
+
+        if ($request->filled('date')) {
+            $query->whereDate('datetime', $request->date);
+        }
+
+        if ($request->filled('time')) {
+            $query->whereTime('datetime', $request->time);
+        }
+
+        if ($request->filled('place')) {
+            $query->where('place', $request->place);
+        }
+
+        if ($request->filled('implementor')) {
+            $query->where('implementor', $request->implementor);
+        }
+
+        $tasks = $query->orderBy('datetime', 'asc')->get();
+
         return view('task.index', compact('tasks'));
     }
 

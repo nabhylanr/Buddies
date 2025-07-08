@@ -18,12 +18,10 @@ class CalendarController extends Controller
         $start = $request->input('start');
         $end = $request->input('end');
 
-        // Ambil semua tasks dalam rentang waktu yang diminta
         $tasks = Task::whereBetween('datetime', [$start, $end])
             ->orderBy('datetime', 'asc')
             ->get();
 
-        // Kelompokkan tasks berdasarkan tanggal
         $events = [];
         foreach ($tasks as $task) {
             $dateKey = $task->date_key;

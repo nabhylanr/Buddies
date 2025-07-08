@@ -76,43 +76,65 @@
               </div>
 
               <!-- Time -->
-              <div class="col-span-full">
-                <label for="time" class="block text-sm font-medium text-gray-900">Jam</label>
-                <div class="mt-2">
-                  <select name="time" id="time" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    <option value="">-- Pilih Jam --</option>
-                    @foreach (['10:00', '13:00', '15:00'] as $hour)
-                      <option value="{{ $hour }}"
-                        {{ old('time', \Carbon\Carbon::parse($task->datetime)->format('H:i')) == $hour ? 'selected' : '' }}>
-                        {{ \Carbon\Carbon::createFromFormat('H:i', $hour)->format('H.i') }}
-                      </option>
-                    @endforeach
-                  </select>
-                </div>
-              </div>
+<div class="col-span-full">
+  <label for="time" class="block text-sm font-medium text-gray-900">Jam</label>
+  <div class="mt-2 relative">
+    <select name="time" id="time" required
+      class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10">
+      <option value="">Jam</option>
+      @foreach (['10:00', '13:00', '15:00'] as $hour)
+        <option value="{{ $hour }}"
+          {{ old('time', \Carbon\Carbon::parse($task->datetime)->format('H:i')) == $hour ? 'selected' : '' }}>
+          {{ \Carbon\Carbon::createFromFormat('H:i', $hour)->format('H.i') }}
+        </option>
+      @endforeach
+    </select>
+    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
+      </svg>
+    </div>
+  </div>
+</div>
 
-              <!-- Place -->
-              <div class="col-span-full">
-                <label for="place" class="block text-sm font-medium text-gray-900">Tempat</label>
-                <div class="mt-2">
-                  <input type="text" name="place" id="place" value="{{ old('place', $task->place) }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
-                </div>
-              </div>
+<!-- Place Dropdown -->
+<div class="col-span-full">
+  <label for="place" class="block text-sm font-medium text-gray-900">Tempat</label>
+  <div class="mt-2 relative">
+    <select name="place" id="place" required
+      class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10">
+      <option value="">Tempat</option>
+      <option value="Online" {{ old('place', $task->place) == 'Online' ? 'selected' : '' }}>Online</option>
+      <option value="Offline" {{ old('place', $task->place) == 'Offline' ? 'selected' : '' }}>Offline</option>
+    </select>
+    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
+      </svg>
+    </div>
+  </div>
+</div>
 
-              <!-- Implementor -->
-              <div class="col-span-full">
-                <label for="implementor" class="block text-sm font-medium text-gray-900">Implementor</label>
-                <div class="mt-2">
-                  <input type="text" name="implementor" id="implementor" value="{{ old('implementor', $task->implementor) }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
+<!-- Implementor Dropdown -->
+<div class="col-span-full">
+  <label for="implementor" class="block text-sm font-medium text-gray-900">Implementor</label>
+  <div class="mt-2 relative">
+    <select name="implementor" id="implementor" required
+      class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10">
+      <option value="">Implementor</option>
+      <option value="Pipin" {{ old('implementor', $task->implementor) == 'Pipin' ? 'selected' : '' }}>Pipin</option>
+      <option value="Adit" {{ old('implementor', $task->implementor) == 'Adit' ? 'selected' : '' }}>Adit</option>
+    </select>
+    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
+      </svg>
+    </div>
+  </div>
+</div>
 
         <div class="mt-6 flex items-center justify-end gap-x-6">
           <a href="{{ route('tasks.index') }}" class="text-sm font-semibold text-gray-700 hover:underline">Kembali</a>
