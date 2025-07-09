@@ -164,7 +164,7 @@
                   <td class="px-6 py-4">{{ $recap->created_at->format('d M Y') }}</td>
                   <td class="px-6 py-4">
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                      {{ $recap->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                      {{ $recap->status === 'pending' ? 'bg-red-100 text-red-800' : 
                         ($recap->status === 'scheduled' ? 'bg-blue-100 text-blue-800' : 
                         'bg-green-100 text-green-800') }}">
                       {{ ucfirst($recap->status) }}

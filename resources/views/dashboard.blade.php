@@ -19,12 +19,12 @@
       <div class="flex items-center justify-between mb-8">
         <div>
           <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            Dashboard
+            Hi, Buddies!
           </h2>
         </div>
         <div class="flex space-x-3">
           <a href="{{ route('tasks.index') }}"
-              class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-semibold shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+              class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
               </svg>
@@ -109,30 +109,30 @@
       <!-- Filter Options -->
       <div class="mb-6" x-data="{ currentFilter: 'all' }">
         <div class="flex flex-wrap gap-2">
-          <button @click="filterTasks('all')" 
-                  :class="currentFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+          <button @click="currentFilter = 'all'; filterTasks('all')" 
+                  :class="currentFilter === 'all' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
                   class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             Semua Task
           </button>
-          <button @click="filterTasks('today')" 
-                  :class="currentFilter === 'today' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+          <button @click="currentFilter = 'today'; filterTasks('today')" 
+                  :class="currentFilter === 'today' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
                   class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             Hari Ini
           </button>
-          <button @click="filterTasks('week')" 
-                  :class="currentFilter === 'week' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+          <button @click="currentFilter = 'week'; filterTasks('week')" 
+                  :class="currentFilter === 'week' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
                   class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             Minggu Ini
           </button>
-          <button @click="filterTasks('upcoming')" 
-                  :class="currentFilter === 'upcoming' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+          <button @click="currentFilter = 'upcoming'; filterTasks('upcoming')" 
+                  :class="currentFilter === 'upcoming' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
                   class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             Mendatang
           </button>
         </div>
       </div>
 
-      <!-- Task List -->
+      <!-- Task List - Reminders Style -->
       <div id="taskContainer">
         @if($tasks->isEmpty())
           <div class="text-center py-12">
@@ -145,71 +145,74 @@
             <p class="text-gray-400 text-sm mt-2">Mulai dengan menambahkan task baru</p>
           </div>
         @else
-          <div id="taskList" class="space-y-4">
-            @foreach($tasks as $task)
-              <div class="task-item bg-white rounded-xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 hover:border-indigo-200 transform hover:-translate-y-1"
-                   data-date="{{ $task->datetime->format('Y-m-d') }}"
-                   data-datetime="{{ $task->datetime->toISOString() }}">
-                <div class="flex justify-between items-start">
-                  <div class="flex-1">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $task->title }}</h3>
-                    <p class="text-gray-600 mb-4 leading-relaxed">{{ $task->description }}</p>
+          <div class="bg-white rounded-lg">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-100">
+              <h3 class="text-2xl font-semibold text-grey-900">Reminders</h3>
+              <div class="bg-gray-900 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                <span id="taskCount">{{ count($tasks) }}</span>
+              </div>
+            </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                      <div class="flex items-center text-sm text-gray-600 bg-blue-50 px-3 py-2 rounded-lg">
-                        <span class="text-blue-500 mr-2">🕒</span>
-                        {{ $task->datetime->setTimezone('Asia/Jakarta')->format('d M Y, H:i') }}
-                      </div>
-                      <div class="flex items-center text-sm text-gray-600 bg-green-50 px-3 py-2 rounded-lg">
-                        <span class="text-green-500 mr-2">📍</span>
-                        {{ $task->place }}
-                      </div>
-                      <div class="flex items-center text-sm text-gray-600 bg-purple-50 px-3 py-2 rounded-lg">
-                        <span class="text-purple-500 mr-2">👤</span>
-                        @if($task->implementor === 'Pipin')
-                          <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-1 rounded">Pipin</span>
-                        @elseif($task->implementor === 'Adit')
-                          <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded">Adit</span>
-                        @else
-                          <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded">{{ $task->implementor }}</span>
-                        @endif
-                      </div>
-                    </div>
+            <!-- Task List -->
+            <div id="taskList" class="divide-y divide-gray-100">
+              @foreach($tasks as $task)
+                <div class="task-item p-6 hover:bg-gray-50 transition-colors duration-200"
+                     data-date="{{ $task->datetime->format('Y-m-d') }}"
+                     data-datetime="{{ $task->datetime->format('Y-m-d H:i:s') }}">
+                  <div class="flex items-start space-x-4">
+                    <!-- Checkbox -->
+                    <form action="{{ route('tasks.complete', $task->id) }}" method="POST" class="inline">
+                      @csrf
+                      @method('PATCH')
+                      <button type="submit" 
+                              class="mt-1 w-5 h-5 border-2 border-gray-300 rounded-full hover:border-gray-900 transition-colors duration-200 flex items-center justify-center group"
+                              onclick="return confirm('Tandai task ini sebagai selesai?')">
+                        <div class="w-0 h-0 bg-gray-900 rounded-full group-hover:w-2 group-hover:h-2 transition-all duration-200"></div>
+                      </button>
+                    </form>
 
-                    <div class="flex justify-between items-center">
-                      <div class="flex space-x-2">
+                    <!-- Task Content -->
+                    <div class="flex-1 min-w-0"> 
+                    <div class="flex items-center justify-between"> 
+                        <div class="flex-1">
+                        <h4 class="text-s font-semibold text-gray-800 mb-0.5">{{ $task->title }}</h4> 
+                        <div class="flex items-center space-x-3 text-xs text-gray-500">
+                            <span>{{ $task->datetime->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') }}</span>
+                            <span>{{ $task->place }}</span>
+                            <span>{{ $task->implementor }}</span>
+                        </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex items-center space-x-2 ml-2">
                         <a href="{{ route('tasks.edit', $task->id) }}"
-                           class="text-yellow-600 hover:text-yellow-800 font-medium text-sm px-3 py-1 rounded-md hover:bg-yellow-50 transition-colors">
-                          Edit
+                            class="text-gray-400 hover:text-gray-700 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
                         </a>
                         <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" class="inline">
-                          @csrf
-                          @method('DELETE')
-                          <button type="submit" 
-                                  class="text-red-600 hover:text-red-800 font-medium text-sm px-3 py-1 rounded-md hover:bg-red-50 transition-colors"
-                                  onclick="return confirm('Yakin ingin menghapus task ini?')">
-                            Hapus
-                          </button>
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="text-gray-400 hover:text-red-600 transition"
+                                    onclick="return confirm('Yakin ingin menghapus task ini?')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            </button>
                         </form>
-                      </div>
-                      
-                      <form action="{{ route('tasks.complete', $task->id) }}" method="POST" class="inline">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" 
-                                class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-green-600 text-white text-sm font-semibold shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                                onclick="return confirm('Tandai task ini sebagai selesai?')">
-                          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                          </svg>
-                          Selesai
-                        </button>
-                      </form>
+                        </div>
                     </div>
+                    </div>
+
                   </div>
                 </div>
-              </div>
-            @endforeach
+              @endforeach
+            </div>
           </div>
         @endif
       </div>
@@ -223,38 +226,55 @@ function filterTasks(filter) {
   const taskItems = document.querySelectorAll('.task-item');
   const today = new Date();
   
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000 - 1); 
+  
+  let visibleCount = 0;
+  
   taskItems.forEach(item => {
-    const taskDate = new Date(item.dataset.datetime);
+    const taskDatetime = new Date(item.dataset.datetime);
+    const taskDate = new Date(taskDatetime.getFullYear(), taskDatetime.getMonth(), taskDatetime.getDate());
     let shouldShow = false;
     
     switch(filter) {
       case 'today':
-        shouldShow = taskDate.toDateString() === today.toDateString();
+        shouldShow = taskDate.getTime() === todayStart.getTime();
         break;
+        
       case 'week':
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay());
+        const startOfWeek = new Date(todayStart);
+        startOfWeek.setDate(todayStart.getDate() - todayStart.getDay());
+        
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
+        
         shouldShow = taskDate >= startOfWeek && taskDate <= endOfWeek;
         break;
+        
       case 'upcoming':
-        shouldShow = taskDate > today;
+        shouldShow = taskDate > todayStart;
         break;
-      default:
+        
+      default: 
         shouldShow = true;
     }
     
     if (shouldShow) {
       item.style.display = 'block';
+      visibleCount++;
     } else {
       item.style.display = 'none';
     }
   });
+  
+  document.getElementById('taskCount').textContent = visibleCount;
 }
 
-// Bind filter function to window for Alpine.js
 window.filterTasks = filterTasks;
+
+document.addEventListener('DOMContentLoaded', function() {
+  filterTasks('all');
+});
 </script>
 </body>
 </html>
