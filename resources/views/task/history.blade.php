@@ -179,8 +179,8 @@
                     </div>
                   </td>
                   <td class="px-6 py-4 font-medium text-gray-900">{{ $task->title }}</td>
-                  <td class="px-6 py-4">{{ $task->formatted_date }}</td>
-                  <td class="px-6 py-4">{{ $task->formatted_time }}</td>
+                  <td class="px-6 py-4">{{ \Carbon\Carbon::parse($task->datetime)->format('d M Y') }}</td>
+                  <td class="px-6 py-4">{{ \Carbon\Carbon::parse($task->datetime)->format('H:i') }}</td>
                   <td class="px-6 py-4">{{ $task->place }}</td>
                   <td class="px-6 py-4">
                     @if($task->implementor === 'Pipin')

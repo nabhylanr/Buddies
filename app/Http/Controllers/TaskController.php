@@ -210,4 +210,40 @@ class TaskController extends Controller
             'used_slots' => $usedTimeSlots
         ]);
     }
+
+    public function dashboard()
+    {
+        $today = Carbon::today('Asia/Jakarta');
+        $startOfWeek = $today->copy()->startOfWeek();
+        $endOfWeek = $today->copy()->endOfWeek();
+        
+        // Get all pending tasks
+        $tasks = Task::where('status', 'pending')
+                    ->orderBy('datetime', 'asc')
+                    ->get();
+        
+        // Calculate statistics
+        $totalTasks = $tasks->count();
+        
+        $todayTasks = $tasks->filter(function ($task) use ($today) {
+            return $task->datetime->setTimezone('Asia/Jakarta')->isSameDay($today);
+        })->count();
+        
+        $weekTasks = $tasks->filter(function ($task) use ($startOfWeek, $endOfWeek) {
+            $taskDate = $task->datetime->setTimezone('Asia/Jakarta');
+            return $taskDate->between($startOfWeek, $endOfWeek);
+        })->count();
+        
+        $upcomingTasks = $tasks->filter(function ($task) use ($today) {
+            return $task->datetime->setTimezone('Asia/Jakarta')->isAfter($today);
+        })->count();
+        
+        return view('dashboard', compact(
+            'tasks',
+            'totalTasks',
+            'todayTasks',
+            'weekTasks',
+            'upcomingTasks'
+        ));
+    }
 }
