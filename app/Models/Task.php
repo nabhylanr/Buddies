@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
@@ -9,7 +11,7 @@ class Task extends Model
     use HasFactory;
     
     protected $fillable = [
-        'title',
+        'recap_id',
         'description',
         'datetime',
         'place',
@@ -22,6 +24,24 @@ class Task extends Model
         'datetime' => 'datetime',
         'completed_at' => 'datetime'
     ];
+
+    // Relasi dengan Recap
+    public function recap()
+    {
+        return $this->belongsTo(Recap::class);
+    }
+
+    // Accessor untuk mendapatkan title dari nama perusahaan
+    public function getTitleAttribute()
+    {
+        return $this->recap ? $this->recap->nama_perusahaan : 'Perusahaan tidak ditemukan';
+    }
+
+    // Accessor untuk mendapatkan full company name
+    public function getFullCompanyNameAttribute()
+    {
+        return $this->recap ? $this->recap->full_company_name : 'Perusahaan tidak ditemukan';
+    }
 
     // Scope untuk task yang pending
     public function scopePending($query)

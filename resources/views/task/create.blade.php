@@ -45,13 +45,27 @@
 
             <div class="mt-10 grid grid-cols-1 gap-y-8">
 
-              <!-- Title -->
+              <!-- Company Selection -->
               <div class="col-span-full">
-                <label for="title" class="block text-sm font-medium text-gray-900">Judul Task</label>
-                <div class="mt-2">
-                  <input type="text" name="title" id="title" value="{{ old('title') }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" />
+                <label for="recap_id" class="block text-sm font-medium text-gray-900">Nama Perusahaan</label>
+                <div class="mt-2 relative">
+                  <select name="recap_id" id="recap_id" required
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
+                    <option value="">Pilih Perusahaan</option>
+                    @foreach($recaps as $recap)
+                      <option value="{{ $recap->id }}" {{ old('recap_id') == $recap->id ? 'selected' : '' }}>
+                        {{ $recap->nama_perusahaan }} - {{ $recap->cabang }}
+                      </option>
+                    @endforeach
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
+                    </svg>
+                  </div>
                 </div>
+                <p class="mt-1 text-sm text-gray-500">Pilih perusahaan yang akan menjadi judul task</p>
               </div>
 
               <!-- Description -->

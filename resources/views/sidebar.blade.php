@@ -24,6 +24,10 @@
       Calendar
     </a>
 
+    <a href="/recaps" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 hover:text-black transition">
+      Recap
+    </a>
+
     <a href="/tasks" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 hover:text-black transition">
       Tasks
     </a>

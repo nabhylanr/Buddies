@@ -1,7 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\Recap;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 
@@ -9,13 +12,16 @@ class TaskController extends Controller
 {
     public function create()
     {
-        return view('task.create');
+        // Ambil semua data recap untuk dropdown
+        $recaps = Recap::orderBy('nama_perusahaan', 'asc')->get();
+        
+        return view('task.create', compact('recaps'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'recap_id' => 'required|exists:recaps,id',
             'description' => 'required|string',
             'date' => 'required|date',
             'time' => 'required',
@@ -28,7 +34,7 @@ class TaskController extends Controller
         $this->validateScheduleConflict($request->implementor, $datetime);
 
         Task::create([
-            'title' => $request->title,
+            'recap_id' => $request->recap_id,
             'description' => $request->description,
             'datetime' => $datetime,
             'place' => $request->place,
@@ -42,7 +48,7 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
-        $query = Task::where('status', 'pending'); 
+        $query = Task::with('recap')->where('status', 'pending'); 
         
         if ($request->filled('date')) {
             $query->whereDate('datetime', $request->date);
@@ -58,6 +64,13 @@ class TaskController extends Controller
         
         if ($request->filled('implementor')) {
             $query->where('implementor', $request->implementor);
+        }
+
+        // Filter berdasarkan nama perusahaan
+        if ($request->filled('company')) {
+            $query->whereHas('recap', function($q) use ($request) {
+                $q->where('nama_perusahaan', 'like', '%' . $request->company . '%');
+            });
         }
 
         $tasks = $query->orderBy('datetime', 'asc')->get();
@@ -67,7 +80,7 @@ class TaskController extends Controller
 
     public function history(Request $request)
     {
-        $query = Task::where('status', 'completed'); 
+        $query = Task::with('recap')->where('status', 'completed'); 
         
         if ($request->filled('date')) {
             $query->whereDate('datetime', $request->date);
@@ -83,6 +96,13 @@ class TaskController extends Controller
         
         if ($request->filled('implementor')) {
             $query->where('implementor', $request->implementor);
+        }
+
+        // Filter berdasarkan nama perusahaan
+        if ($request->filled('company')) {
+            $query->whereHas('recap', function($q) use ($request) {
+                $q->where('nama_perusahaan', 'like', '%' . $request->company . '%');
+            });
         }
 
         $tasks = $query->orderBy('completed_at', 'desc')->get(); 
@@ -112,19 +132,22 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
+        $task->load('recap');
         return view('task.show', compact('task'));
     }
 
     public function edit($id)
     {
-        $task = Task::findOrFail($id);
-        return view('task.edit', compact('task'));
+        $task = Task::with('recap')->findOrFail($id);
+        $recaps = Recap::orderBy('nama_perusahaan', 'asc')->get();
+        
+        return view('task.edit', compact('task', 'recaps'));
     }
 
     public function update(Request $request, Task $task)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'recap_id' => 'required|exists:recaps,id',
             'description' => 'required|string',
             'date' => 'required|date',
             'time' => 'required',
@@ -137,7 +160,7 @@ class TaskController extends Controller
         $this->validateScheduleConflict($request->implementor, $datetime, $task->id);
 
         $task->update([
-            'title' => $request->title,
+            'recap_id' => $request->recap_id,
             'description' => $request->description,
             'datetime' => $datetime,
             'place' => $request->place,
@@ -217,8 +240,9 @@ class TaskController extends Controller
         $startOfWeek = $today->copy()->startOfWeek();
         $endOfWeek = $today->copy()->endOfWeek();
         
-        // Get all pending tasks
-        $tasks = Task::where('status', 'pending')
+        // Get all pending tasks with recap data
+        $tasks = Task::with('recap')
+                    ->where('status', 'pending')
                     ->orderBy('datetime', 'asc')
                     ->get();
         
