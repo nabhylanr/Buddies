@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 
 class RecapController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = Recap::query();
@@ -26,26 +23,26 @@ class RecapController extends Controller
             $query->where('cabang', $request->cabang);
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $recaps = $query->latest()->paginate(10);
         $cabangList = Recap::select('cabang')->distinct()->pluck('cabang');
+        $statusList = Recap::select('status')->distinct()->pluck('status');
 
         return view('recaps.index', [
             'recaps' => $recaps,
             'cabangList' => $cabangList,
+            'statusList' => $statusList,
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('recaps.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -56,31 +53,29 @@ class RecapController extends Controller
             'keterangan' => 'nullable|string'
         ]);
 
-        Recap::create($request->all());
+        Recap::create([
+            'company_id' => $request->company_id,
+            'nama_perusahaan' => $request->nama_perusahaan,
+            'cabang' => $request->cabang,
+            'sales' => $request->sales,
+            'keterangan' => $request->keterangan,
+            'status' => 'pending',
+        ]);
 
         return redirect()->route('recaps.index')
             ->with('success', 'Recap berhasil ditambahkan!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Recap $recap)
     {
         return view('recaps.show', compact('recap'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Recap $recap)
     {
         return view('recaps.edit', compact('recap'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Recap $recap)
     {
         $request->validate([
@@ -97,9 +92,6 @@ class RecapController extends Controller
             ->with('success', 'Recap berhasil diupdate!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Recap $recap)
     {
         $recap->delete();
