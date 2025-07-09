@@ -48,7 +48,7 @@
 
               <!-- Title -->
               <div class="col-span-full">
-                <label for="title" class="block text-sm font-medium text-gray-900">Judul Task</label>
+                <label for="title" class="block text-sm font-medium text-gray-900">Nama Perusahaan</label>
                 <div class="mt-2">
                   <input type="text" name="title" id="title" value="{{ old('title', $task->title) }}" required
                     class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" />

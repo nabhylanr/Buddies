@@ -14,29 +14,25 @@ class RecapController extends Controller
     {
         $query = Recap::query();
 
-        // Filter berdasarkan company_id jika ada
         if ($request->filled('company_id')) {
             $query->where('company_id', 'like', '%' . $request->company_id . '%');
         }
 
-        // Filter berdasarkan nama perusahaan jika ada
         if ($request->filled('nama_perusahaan')) {
             $query->where('nama_perusahaan', 'like', '%' . $request->nama_perusahaan . '%');
         }
 
-        // Filter berdasarkan cabang jika ada
         if ($request->filled('cabang')) {
             $query->where('cabang', $request->cabang);
         }
 
-        // Filter berdasarkan sales jika ada
-        if ($request->filled('sales')) {
-            $query->where('sales', $request->sales);
-        }
-
         $recaps = $query->latest()->paginate(10);
+        $cabangList = Recap::select('cabang')->distinct()->pluck('cabang');
 
-        return view('recaps.index', compact('recaps'));
+        return view('recaps.index', [
+            'recaps' => $recaps,
+            'cabangList' => $cabangList,
+        ]);
     }
 
     /**

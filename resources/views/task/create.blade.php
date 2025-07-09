@@ -65,7 +65,6 @@
                     </svg>
                   </div>
                 </div>
-                <p class="mt-1 text-sm text-gray-500">Pilih perusahaan yang akan menjadi judul task</p>
               </div>
 
               <!-- Description -->

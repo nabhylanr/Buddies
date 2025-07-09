@@ -160,7 +160,7 @@
             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
               <tr>
                 <th class="px-6 py-3">Status</th>
-                <th class="px-6 py-3">Judul</th>
+                <th class="px-6 py-3">Nama Perusahaan</th>
                 <th class="px-6 py-3">Tanggal</th>
                 <th class="px-6 py-3">Jam</th>
                 <th class="px-6 py-3">Tempat</th>

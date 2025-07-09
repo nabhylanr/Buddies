@@ -81,31 +81,9 @@
                 <select name="cabang" id="cabang"
                         class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
                   <option value="">Semua Cabang</option>
-                  @foreach(['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang'] as $cabang)
+                  @foreach($cabangList as $cabang)
                     <option value="{{ $cabang }}" {{ request('cabang') == $cabang ? 'selected' : '' }}>
                       {{ $cabang }}
-                    </option>
-                  @endforeach
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- Sales -->
-            <div>
-              <label for="sales" class="block text-sm font-medium text-gray-700 mb-1">Sales</label>
-              <div class="relative">
-                <select name="sales" id="sales"
-                        class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
-                  <option value="">Semua Sales</option>
-                  @foreach(['Ahmad', 'Budi', 'Citra', 'Deni', 'Eka'] as $sales)
-                    <option value="{{ $sales }}" {{ request('sales') == $sales ? 'selected' : '' }}>
-                      {{ $sales }}
                     </option>
                   @endforeach
                 </select>
