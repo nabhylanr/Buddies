@@ -176,9 +176,9 @@
                     <div class="flex-1 min-w-0"> 
                     <div class="flex items-center justify-between"> 
                         <div class="flex-1">
-                        <h4 class="text-s font-semibold text-gray-800 mb-0.5">{{ $task->title }}</h4> 
+                        <h4 class="text-s font-semibold text-gray-800 mb-0.5">{{ $task->title ?? $task->description }}</h4> 
                         <div class="flex items-center space-x-3 text-xs text-gray-500">
-                            <span>{{ $task->datetime->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') }}</span>
+                            <span>{{ $task->datetime->format('d/m/Y H:i') }}</span>
                             <span>{{ $task->place }}</span>
                             <span>{{ $task->implementor }}</span>
                         </div>

@@ -7,17 +7,16 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Custom styles for dropdown animation */
     .dropdown-menu {
       transition: opacity 0.15s ease-out, transform 0.15s ease-out;
       opacity: 0;
       transform: translateY(-8px) scale(0.95);
-      pointer-events: none; /* Prevents interaction when hidden */
+      pointer-events: none; 
     }
     .dropdown-menu.show {
       opacity: 1;
       transform: translateY(0) scale(1);
-      pointer-events: auto; /* Allows interaction when shown */
+      pointer-events: auto; 
     }
 
     .dropdown-arrow-rotate {
@@ -184,15 +183,14 @@ class RealTimeCalendar {
 
   init() {
     this.setupEventListeners();
-    this.updateDropdownContent(); // Populate dropdown when initialized
-    this.loadEventsAndRender(); // Load events and render the calendar initially
+    this.updateDropdownContent(); 
+    this.loadEventsAndRender(); 
   }
 
-  // Combines loading events and rendering the calendar
   async loadEventsAndRender() {
-    this.render(); // Render calendar structure first (with loading)
-    await this.loadEvents(); // Then load actual events
-    this.render(); // Re-render with events
+    this.render(); 
+    await this.loadEvents(); 
+    this.render(); 
   }
 
   async loadEvents() {
@@ -227,7 +225,6 @@ class RealTimeCalendar {
   }
 
   setupEventListeners() {
-    // Month navigation buttons
     document.getElementById('prevMonth').addEventListener('click', () => {
       this.viewDate.setMonth(this.viewDate.getMonth() - 1);
       this.loadEventsAndRender();
@@ -246,14 +243,12 @@ class RealTimeCalendar {
       this.updateDropdownContent(); // Keep dropdown in sync
     });
 
-    // --- Dropdown functionality ---
     const menuButton = document.getElementById('menu-button');
     const dropdownMenu = document.getElementById('dropdown-menu');
     const dropdownArrow = document.getElementById('dropdown-arrow');
 
-    // Toggle dropdown visibility
     menuButton.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent document click from closing it immediately
+      e.stopPropagation(); 
       if (dropdownMenu.classList.contains('show')) {
         this.closeDropdown();
       } else {
@@ -261,29 +256,26 @@ class RealTimeCalendar {
       }
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
         this.closeDropdown();
       }
     });
 
-    // Year navigation inside dropdown
     document.getElementById('prevYear').addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent closing dropdown
+      e.stopPropagation(); 
       this.viewDate.setFullYear(this.viewDate.getFullYear() - 1);
-      this.loadEventsAndRender(); // <--- ADDED THIS LINE
+      this.loadEventsAndRender(); 
       this.updateDropdownContent();
     });
 
     document.getElementById('nextYear').addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent closing dropdown
+      e.stopPropagation(); 
       this.viewDate.setFullYear(this.viewDate.getFullYear() + 1);
-      this.loadEventsAndRender(); // <--- ADDED THIS LINE
+      this.loadEventsAndRender(); 
       this.updateDropdownContent();
     });
 
-    // Quick actions inside dropdown
     document.getElementById('goToToday').addEventListener('click', (e) => {
       e.preventDefault(); 
       this.viewDate = new Date();
@@ -292,9 +284,6 @@ class RealTimeCalendar {
       this.closeDropdown();
     });
 
-    
-
-    // Modal event listeners (already present)
     document.getElementById('closeModal').addEventListener('click', () => {
       document.getElementById('taskModal').classList.add('hidden');
     });
@@ -311,7 +300,7 @@ class RealTimeCalendar {
     const arrow = document.getElementById('dropdown-arrow');
     
     dropdown.classList.remove('hidden');
-    dropdown.classList.add('dropdown-menu', 'show'); // Add 'show' class for animation
+    dropdown.classList.add('dropdown-menu', 'show'); 
     arrow.classList.add('dropdown-arrow-rotate');
     document.getElementById('menu-button').setAttribute('aria-expanded', 'true');
   }
@@ -320,21 +309,18 @@ class RealTimeCalendar {
     const dropdown = document.getElementById('dropdown-menu');
     const arrow = document.getElementById('dropdown-arrow');
     
-    dropdown.classList.remove('show'); // Remove 'show' class to trigger exit animation
+    dropdown.classList.remove('show'); 
     arrow.classList.remove('dropdown-arrow-rotate');
     document.getElementById('menu-button').setAttribute('aria-expanded', 'false');
 
-    // Hide fully after animation
     setTimeout(() => {
       dropdown.classList.add('hidden');
-    }, 150); // Match this timeout to your CSS transition duration
+    }, 150); 
   }
 
   updateDropdownContent() {
-    // Update current year display
     document.getElementById('current-year').textContent = this.viewDate.getFullYear();
     
-    // Update month grid
     const monthGrid = document.getElementById('month-grid');
     const currentMonthInView = this.viewDate.getMonth();
     const currentYearInView = this.viewDate.getFullYear();
@@ -363,14 +349,13 @@ class RealTimeCalendar {
       `;
     }).join('');
     
-    // Add event listeners to month buttons within the dropdown
     monthGrid.querySelectorAll('button').forEach(button => {
       button.addEventListener('click', (e) => {
         const monthIndex = parseInt(e.target.dataset.month);
         this.viewDate.setMonth(monthIndex); 
-        this.loadEventsAndRender(); // <--- Crucial: Re-render the main calendar with new month/year
-        this.updateDropdownContent(); // Update dropdown state (e.g., active month styling)
-        this.closeDropdown(); // Close dropdown after selection
+        this.loadEventsAndRender(); 
+        this.updateDropdownContent(); 
+        this.closeDropdown(); 
       });
     });
   }
@@ -392,7 +377,7 @@ class RealTimeCalendar {
           </div>
           <div>
               <span class="text-sm font-medium text-gray-700">Status:</span>
-              <p class="text-sm text-gray-900 capitalize">${task.status || 'Uncompleted'}</p>
+              <p class="text-sm text-gray-900 capitalize">${task.status || 'Scheduled'}</p>
           </div>
         </div>
         <div>
@@ -583,7 +568,6 @@ class RealTimeCalendar {
     const calendarGrid = document.getElementById('calendar-grid');
     calendarGrid.innerHTML = days.map(day => this.renderDay(day)).join('');
 
-    // Add event listeners to task events
     document.querySelectorAll('.task-event').forEach(button => {
       button.addEventListener('click', (e) => {
         const task = JSON.parse(e.currentTarget.dataset.task);
@@ -591,7 +575,6 @@ class RealTimeCalendar {
       });
     });
 
-    // Add event listeners to "more events" buttons
     document.querySelectorAll('.more-events').forEach(button => {
       button.addEventListener('click', (e) => {
         const dateKey = e.currentTarget.dataset.date;
@@ -599,7 +582,6 @@ class RealTimeCalendar {
       });
     });
 
-    // Remove loading indicator if present
     const loading = document.getElementById('loading');
     if (loading) {
       loading.remove();

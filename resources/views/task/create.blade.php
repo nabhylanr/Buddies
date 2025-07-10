@@ -168,7 +168,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const timeConflictMessage = document.getElementById('time-conflict-message');
     const submitBtn = document.getElementById('submit-btn');
 
-    // Function to check available time slots
     function checkAvailableTimeSlots() {
         const implementor = implementorSelect.value;
         const date = dateInput.value;
@@ -178,11 +177,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading state
         timeSelect.disabled = true;
         timeSelect.innerHTML = '<option value="">Mengecek ketersediaan...</option>';
 
-        // Make API call to check available slots
         fetch(`/api/tasks/available-time-slots?implementor=${implementor}&date=${date}`)
             .then(response => response.json())
             .then(data => {
@@ -197,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Function to update time options based on availability
     function updateTimeOptions(availableSlots, usedSlots) {
         const allSlots = [
             { value: '10:00', text: '10.00' },
@@ -221,7 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSelect.appendChild(option);
         });
 
-        // Show message if no slots available
         if (availableSlots.length === 0) {
             timeConflictMessage.textContent = `Semua slot waktu untuk ${implementorSelect.value} pada tanggal ${dateInput.value} sudah terisi.`;
             timeConflictMessage.classList.remove('hidden');
@@ -234,7 +229,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to reset time options to default
     function resetTimeOptions() {
         timeSelect.innerHTML = `
             <option value="">Pilih Jam</option>
@@ -247,11 +241,9 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
 
-    // Event listeners
     implementorSelect.addEventListener('change', checkAvailableTimeSlots);
     dateInput.addEventListener('change', checkAvailableTimeSlots);
 
-    // Form submission validation
     document.querySelector('form').addEventListener('submit', function(e) {
         const selectedTime = timeSelect.value;
         const selectedOption = timeSelect.querySelector(`option[value="${selectedTime}"]`);
