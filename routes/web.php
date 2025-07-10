@@ -8,6 +8,14 @@ Route::get('/', function () {
     return view('calendar');
 });
 
+Route::get('/login', function () {
+    return view('session.login');
+});
+
+Route::get('/register', function () {
+    return view('session.register');
+});
+
 Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 Route::get('/calendar/events', [CalendarController::class, 'getEvents'])->name('calendar.events');
 
