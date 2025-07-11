@@ -5,6 +5,8 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\RecapController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
+use App\Models\Task;
+use App\Models\Recap;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -71,7 +73,7 @@ Route::middleware('auth')->group(function () {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
         }
         $controller = app(TaskController::class);
-        return $controller->history();
+        return $controller->history(request());
     })->name('tasks.history');
 
     Route::post('/tasks', function () {
@@ -83,7 +85,7 @@ Route::middleware('auth')->group(function () {
         return $controller->store(request());
     })->name('tasks.store');
 
-    Route::patch('/tasks/{task}/complete', function ($task) {
+    Route::patch('/tasks/{task}/complete', function (Task $task) {
         $user = Auth::user();
         if (!$user->canAccessTasks()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
@@ -92,7 +94,7 @@ Route::middleware('auth')->group(function () {
         return $controller->complete($task);
     })->name('tasks.complete');
 
-    Route::patch('/tasks/{task}/uncomplete', function ($task) {
+    Route::patch('/tasks/{task}/uncomplete', function (Task $task) {
         $user = Auth::user();
         if (!$user->canAccessTasks()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
@@ -150,7 +152,7 @@ Route::middleware('auth')->group(function () {
         return $controller->store(request());
     })->name('recaps.store');
 
-    Route::get('/recaps/{recap}', function ($recap) {
+    Route::get('/recaps/{recap}', function (Recap $recap) {
         $user = Auth::user();
         if (!$user->canAccessRecaps()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
@@ -159,7 +161,7 @@ Route::middleware('auth')->group(function () {
         return $controller->show($recap);
     })->name('recaps.show');
 
-    Route::get('/recaps/{recap}/edit', function ($recap) {
+    Route::get('/recaps/{recap}/edit', function (Recap $recap) {
         $user = Auth::user();
         if (!$user->canAccessRecaps()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
@@ -168,7 +170,7 @@ Route::middleware('auth')->group(function () {
         return $controller->edit($recap);
     })->name('recaps.edit');
 
-    Route::put('/recaps/{recap}', function ($recap) {
+    Route::put('/recaps/{recap}', function (Recap $recap) {
         $user = Auth::user();
         if (!$user->canAccessRecaps()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
@@ -177,7 +179,7 @@ Route::middleware('auth')->group(function () {
         return $controller->update(request(), $recap);
     })->name('recaps.update');
 
-    Route::delete('/recaps/{recap}', function ($recap) {
+    Route::delete('/recaps/{recap}', function (Recap $recap) {
         $user = Auth::user();
         if (!$user->canAccessRecaps()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');

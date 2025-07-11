@@ -22,17 +22,14 @@ class RoleMiddleware
 
         $user = Auth::user();
         
-        // Admin can access everything
         if ($user->isAdmin()) {
             return $next($request);
         }
         
-        // Check specific role
         if ($user->hasRole($role)) {
             return $next($request);
         }
         
-        // Redirect to appropriate dashboard if user doesn't have access
         if ($user->isUser()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
         } elseif ($user->isImplementor()) {
