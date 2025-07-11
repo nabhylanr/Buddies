@@ -152,9 +152,10 @@ class TaskController extends Controller
         return view('task.show', compact('task'));
     }
 
-    public function edit($id)
+    // Fixed edit method - now accepts Task model directly
+    public function edit(Task $task)
     {
-        $task = Task::with('recap')->findOrFail($id);
+        $task->load('recap');
         $recaps = Recap::orderBy('nama_perusahaan', 'asc')->get();
         return view('task.edit', compact('task', 'recaps'));
     }
@@ -185,9 +186,9 @@ class TaskController extends Controller
             ->with('success', 'Task berhasil diperbarui!');
     }
 
-    public function destroy($id)
+    // Fixed destroy method - now accepts Task model directly
+    public function destroy(Task $task)
     {
-        $task = Task::findOrFail($id);
         $task->delete();
         return redirect()->route('tasks.index')->with('success', 'Task berhasil dihapus.');
     }

@@ -112,10 +112,41 @@ Route::middleware('auth')->group(function () {
         return $controller->getAvailableTimeSlots();
     });
 
-    Route::resource('tasks', TaskController::class)
-    ->except(['index', 'create', 'store'])
-    ->middleware('role:implementor'); 
+    Route::get('/tasks/{task}', function (Task $task) {
+        $user = Auth::user();
+        if (!$user->canAccessTasks()) {
+            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
+        }
+        $controller = app(TaskController::class);
+        return $controller->show($task);
+    })->name('tasks.show');
 
+    Route::get('/tasks/{task}/edit', function (Task $task) {
+        $user = Auth::user();
+        if (!$user->canAccessTasks()) {
+            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
+        }
+        $controller = app(TaskController::class);
+        return $controller->edit($task); 
+    })->name('tasks.edit');
+
+    Route::put('/tasks/{task}', function (Task $task) {
+        $user = Auth::user();
+        if (!$user->canAccessTasks()) {
+            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
+        }
+        $controller = app(TaskController::class);
+        return $controller->update(request(), $task);
+    })->name('tasks.update');
+
+    Route::delete('/tasks/{task}', function (Task $task) {
+        $user = Auth::user();
+        if (!$user->canAccessTasks()) {
+            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
+        }
+        $controller = app(TaskController::class);
+        return $controller->destroy($task); 
+    })->name('tasks.destroy');
 
     Route::get('/user/create', function () {
         $user = Auth::user();
@@ -124,7 +155,7 @@ Route::middleware('auth')->group(function () {
         }
         $controller = app(TaskController::class);
         return $controller->create();
-    })->name('meetings.create');
+    })->name('task.create');
 
     Route::get('/recaps', function (Request $request) {
         $user = Auth::user();

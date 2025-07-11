@@ -143,7 +143,6 @@
                 <th class="px-6 py-3">Cabang</th>
                 <th class="px-6 py-3">Sales</th>
                 <th class="px-6 py-3">Keterangan</th>
-                <th class="px-6 py-3">Dibuat</th>
                 <th class="px-6 py-3">Status</th>
                 <th class="px-6 py-3">Aksi</th>
               </tr>
@@ -161,7 +160,6 @@
                       {{ $recap->keterangan ?? '-' }}
                     </div>
                   </td>
-                  <td class="px-6 py-4">{{ $recap->created_at->format('d M Y') }}</td>
                   <td class="px-6 py-4">
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                       {{ $recap->status === 'pending' ? 'bg-red-100 text-red-800' : 

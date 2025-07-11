@@ -45,21 +45,25 @@
 
             <div class="mt-10 grid grid-cols-1 gap-y-8">
 
-              <!-- Title -->
+              <!-- Company Selection -->
               <div class="col-span-full">
-                <label for="title" class="block text-sm font-medium text-gray-900">Judul Task</label>
-                <div class="mt-2">
-                  <input type="text" name="title" id="title" value="{{ old('title') }}" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" />
-                </div>
-              </div>
-
-              <!-- Description -->
-              <div class="col-span-full">
-                <label for="description" class="block text-sm font-medium text-gray-900">Deskripsi</label>
-                <div class="mt-2">
-                  <textarea name="description" id="description" rows="4" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none">{{ old('description') }}</textarea>
+                <label for="recap_id" class="block text-sm font-medium text-gray-900">Nama Perusahaan</label>
+                <div class="mt-2 relative">
+                  <select name="recap_id" id="recap_id" required
+                    class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
+                    <option value="">Pilih Perusahaan</option>
+                    @foreach($recaps as $recap)
+                      <option value="{{ $recap->id }}" {{ old('recap_id') == $recap->id ? 'selected' : '' }}>
+                        {{ $recap->nama_perusahaan }} - {{ $recap->cabang }}
+                      </option>
+                    @endforeach
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
 
@@ -131,6 +135,8 @@
                 </div>
               </div>
 
+              
+
             </div>
           </div>
         </div>
@@ -155,7 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const timeConflictMessage = document.getElementById('time-conflict-message');
     const submitBtn = document.getElementById('submit-btn');
 
-    // Function to check available time slots
     function checkAvailableTimeSlots() {
         const implementor = implementorSelect.value;
         const date = dateInput.value;
@@ -165,11 +170,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading state
         timeSelect.disabled = true;
         timeSelect.innerHTML = '<option value="">Mengecek ketersediaan...</option>';
 
-        // Make API call to check available slots
         fetch(`/api/tasks/available-time-slots?implementor=${implementor}&date=${date}`)
             .then(response => response.json())
             .then(data => {
@@ -184,7 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Function to update time options based on availability
     function updateTimeOptions(availableSlots, usedSlots) {
         const allSlots = [
             { value: '10:00', text: '10.00' },
@@ -208,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSelect.appendChild(option);
         });
 
-        // Show message if no slots available
         if (availableSlots.length === 0) {
             timeConflictMessage.textContent = `Semua slot waktu untuk ${implementorSelect.value} pada tanggal ${dateInput.value} sudah terisi.`;
             timeConflictMessage.classList.remove('hidden');
@@ -221,7 +222,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to reset time options to default
     function resetTimeOptions() {
         timeSelect.innerHTML = `
             <option value="">Pilih Jam</option>
@@ -234,11 +234,9 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
 
-    // Event listeners
     implementorSelect.addEventListener('change', checkAvailableTimeSlots);
     dateInput.addEventListener('change', checkAvailableTimeSlots);
 
-    // Form submission validation
     document.querySelector('form').addEventListener('submit', function(e) {
         const selectedTime = timeSelect.value;
         const selectedOption = timeSelect.querySelector(`option[value="${selectedTime}"]`);

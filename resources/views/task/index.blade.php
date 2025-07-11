@@ -162,6 +162,7 @@
                 <th class="px-6 py-3">Tanggal</th>
                 <th class="px-6 py-3">Jam</th>
                 <th class="px-6 py-3">Tempat</th>
+                <th class="px-6 py-3">Deskripsi</th>
                 <th class="px-6 py-3">Implementor</th>
                 <th class="px-6 py-3">Aksi</th>
                 <th class="px-6 py-3 text-center">Status</th>
@@ -174,6 +175,7 @@
                   <td class="px-6 py-4">{{ \Carbon\Carbon::parse($task->datetime)->format('d M Y') }}</td>
                   <td class="px-6 py-4">{{ \Carbon\Carbon::parse($task->datetime)->format('H:i') }}</td>
                   <td class="px-6 py-4">{{ $task->place }}</td>
+                  <td class="px-6 py-4">{{ $task->description }}</td>
                   <td class="px-6 py-4">
                     @if($task->implementor === 'Pipin')
                       <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">Pipin</span>

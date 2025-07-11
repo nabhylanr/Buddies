@@ -380,9 +380,15 @@ class RealTimeCalendar {
               <p class="text-sm text-gray-900 capitalize">${task.status || 'Scheduled'}</p>
           </div>
         </div>
-        <div>
-          <span class="text-sm font-medium text-gray-700">Place:</span>
-          <p class="text-sm text-gray-900">${task.place}</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <span class="text-sm font-medium text-gray-700">Place:</span>
+            <p class="text-sm text-gray-900">${task.place}</p>
+          </div>
+          <div>
+              <span class="text-sm font-medium text-gray-700">Description:</span>
+              <p class="text-sm text-gray-900 capitalize">${task.description}</p>
+          </div>
         </div>
         <div>
           <span class="text-sm font-medium text-gray-700">Implementor:</span>
