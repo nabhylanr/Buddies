@@ -7,7 +7,9 @@
   <title>Sign In</title>
 </head>
 <body class="bg-cover bg-center h-screen w-screen flex items-center justify-center"
-      style="background-image: url('/images/bg.jpg')">  <div class="backdrop-blur-md bg-white/30 shadow-lg rounded-lg p-8 w-full max-w-md">
+      style="background-image: url('/images/bg.jpg')">
+  
+  <div class="backdrop-blur-md bg-white/30 shadow-lg rounded-lg p-8 w-full max-w-md">
     <div class="text-center">
       <h2 class="text-2xl font-bold tracking-tight text-white">
         Hi, Buddies!
@@ -15,33 +17,42 @@
     </div>
 
     <div class="mt-6">
-      <form class="space-y-6" action="#" method="POST">
+      <form class="space-y-6" action="{{ route('login') }}" method="POST">
+        @csrf
+        
         <div>
           <label for="email" class="block text-sm font-medium text-white">Email</label>
           <div class="mt-2">
-            <input type="email" name="email" id="email" autocomplete="email" required
+            <input type="email" name="email" id="email" value="{{ old('email') }}" autocomplete="email" required
               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-gray-900 sm:text-sm leading-6" />
+            @error('email')
+              <p class="mt-1 text-sm text-red-300">{{ $message }}</p>
+            @enderror
           </div>
         </div>
+
         <div>
           <label for="password" class="block text-sm font-medium text-white">Password</label>
           <div class="mt-2">
             <input type="password" name="password" id="password" autocomplete="current-password" required
               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-gray-900 sm:text-sm leading-6" />
+            @error('password')
+              <p class="mt-1 text-sm text-red-300">{{ $message }}</p>
+            @enderror
           </div>
         </div>
 
         <div>
-            <button type="submit"
-                class="flex w-full justify-center rounded-md border border-white bg-transparent px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                Sign up
-            </button>
+          <button type="submit"
+            class="flex w-full justify-center rounded-md border border-white bg-transparent px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            Sign In
+          </button>
         </div>
       </form>
 
       <p class="mt-6 text-center text-sm text-white">
         Don't have an account?
-        <a href="/register" class="font-semibold text-white hover:text-gray-100">Register</a>
+        <a href="{{ route('register') }}" class="font-semibold text-white hover:text-gray-100">Register</a>
       </p>
     </div>
   </div>
