@@ -18,7 +18,9 @@ class CalendarController extends Controller
         $start = $request->input('start');
         $end = $request->input('end');
 
-        $tasks = Task::whereBetween('datetime', [$start, $end])
+        // Join dengan tabel recaps untuk mendapatkan status real-time
+        $tasks = Task::with('recap')
+            ->whereBetween('datetime', [$start, $end])
             ->orderBy('datetime', 'asc')
             ->get();
 
@@ -30,6 +32,9 @@ class CalendarController extends Controller
                 $events[$dateKey] = [];
             }
 
+            // Ambil status dari recap jika ada, fallback ke task status
+            $status = $task->recap && $task->recap->status ? $task->recap->status : $task->status;
+            
             $events[$dateKey][] = [
                 'id' => $task->id,
                 'title' => $task->title,
@@ -38,6 +43,10 @@ class CalendarController extends Controller
                 'datetime' => $task->iso_datetime,
                 'place' => $task->place,
                 'implementor' => $task->implementor,
+                'status' => $status, // Status dari recap
+                'recap_id' => $task->recap_id,
+                'company_name' => $task->recap ? $task->recap->nama_perusahaan : 'Unknown',
+                'branch' => $task->recap ? $task->recap->cabang : 'Unknown',
             ];
         }
 

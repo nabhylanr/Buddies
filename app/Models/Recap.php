@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Recap extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'company_id',
         'nama_perusahaan',
         'cabang',
         'sales',
-        'keterangan'
+        'keterangan',
+        'status' // Tambahkan status ke fillable
     ];
 
     // Relasi dengan Task (satu recap bisa punya banyak task)
@@ -27,5 +28,53 @@ class Recap extends Model
     public function getFullCompanyNameAttribute()
     {
         return $this->nama_perusahaan . ' - ' . $this->cabang;
+    }
+
+    // Scope untuk filter berdasarkan status
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeScheduled($query)
+    {
+        return $query->where('status', 'scheduled');
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'completed');
+    }
+
+    // Method untuk mengupdate status
+    public function markAsCompleted()
+    {
+        $this->update(['status' => 'completed']);
+    }
+
+    public function markAsScheduled()
+    {
+        $this->update(['status' => 'scheduled']);
+    }
+
+    public function markAsPending()
+    {
+        $this->update(['status' => 'pending']);
+    }
+
+    // Status checkers
+    public function isCompleted()
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isScheduled()
+    {
+        return $this->status === 'scheduled';
+    }
+
+    public function isPending()
+    {
+        return $this->status === 'pending';
     }
 }

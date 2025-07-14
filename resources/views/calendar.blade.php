@@ -360,47 +360,52 @@ class RealTimeCalendar {
     });
   }
 
-  showTaskDetails(task) {
-    const modal = document.getElementById('taskModal');
-    const modalContent = document.getElementById('modal-content');
-    
-    modalContent.innerHTML = `
-      <div class="space-y-4">
+// Update fungsi showTaskDetails untuk menampilkan status yang tepat
+showTaskDetails(task) {
+  const modal = document.getElementById('taskModal');
+  const modalContent = document.getElementById('modal-content');
+  
+  modalContent.innerHTML = `
+    <div class="space-y-4">
+      <div>
+        <h4 class="font-medium text-gray-900">${task.title}</h4>
+        <p class="text-sm text-gray-600 mt-1">${task.description || 'No description'}</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
         <div>
-          <h4 class="font-medium text-gray-900">${task.title}</h4>
-          <p class="text-sm text-gray-600 mt-1">${task.description || 'No description'}</p>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <span class="text-sm font-medium text-gray-700">Time:</span>
-            <p class="text-sm text-gray-900">${task.time}</p>
-          </div>
-          <div>
-              <span class="text-sm font-medium text-gray-700">Status:</span>
-              <p class="text-sm text-gray-900 capitalize">${task.status || 'Scheduled'}</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <span class="text-sm font-medium text-gray-700">Place:</span>
-            <p class="text-sm text-gray-900">${task.place}</p>
-          </div>
-          <div>
-              <span class="text-sm font-medium text-gray-700">Place Information:</span>
-              <p class="text-sm text-gray-900 capitalize">${task.description}</p>
-          </div>
+          <span class="text-sm font-medium text-gray-700">Time:</span>
+          <p class="text-sm text-gray-900">${task.time}</p>
         </div>
         <div>
-          <span class="text-sm font-medium text-gray-700">Implementor:</span>
-          <p class="text-sm text-gray-900">
-            <span class="${this.getImplementorBadgeClass(task.implementor)}">${task.implementor}</span>
+          <span class="text-sm font-medium text-gray-700">Status:</span>
+          <p class="text-sm ${this.getStatusColor(task.status)} capitalize font-medium">
+            <span class="inline-block px-2 py-1 text-xs rounded-full ${this.getStatusBadgeClass(task.status)}">
+              ${task.status}
+            </span>
           </p>
         </div>
       </div>
-    `;
-    
-    modal.classList.remove('hidden');
-  }
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <span class="text-sm font-medium text-gray-700">Place:</span>
+          <p class="text-sm text-gray-900">${task.place}</p>
+        </div>
+        <div>
+          <span class="text-sm font-medium text-gray-700">Company:</span>
+          <p class="text-sm text-gray-900">${task.company_name} - ${task.branch}</p>
+        </div>
+      </div>
+      <div>
+        <span class="text-sm font-medium text-gray-700">Implementor:</span>
+        <p class="text-sm text-gray-900">
+          <span class="${this.getImplementorBadgeClass(task.implementor)}">${task.implementor}</span>
+        </p>
+      </div>
+    </div>
+  `;
+  
+  modal.classList.remove('hidden');
+}
 
   formatMonthYear(date) {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -440,16 +445,35 @@ class RealTimeCalendar {
   }
 
   getStatusColor(status) {
-    switch (status) {
-      case 'completed':
-        return 'text-green-600';
-      case 'cancelled':
-        return 'text-red-600';
-      case 'uncompleted':
-      default:
-        return 'text-gray-900';
-    }
+  switch (status) {
+    case 'completed':
+      return 'text-green-600';
+    case 'scheduled':
+      return 'text-blue-600';
+    case 'pending':
+      return 'text-yellow-600';
+    case 'cancelled':
+      return 'text-red-600';
+    default:
+      return 'text-gray-900';
   }
+}
+
+// Tambahkan fungsi untuk mendapatkan badge color berdasarkan status
+getStatusBadgeClass(status) {
+  switch (status) {
+    case 'completed':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'scheduled':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'cancelled':
+      return 'bg-red-100 text-red-800 border-red-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+}
 
   getImplementorColor(implementor) {
     const normalizedName = implementor.toLowerCase();
@@ -483,89 +507,101 @@ class RealTimeCalendar {
     return `${colors.bg} ${colors.text} text-xs font-medium px-2.5 py-0.5 rounded-sm`;
   }
 
-  renderDay(date) {
-    const isCurrentMonth = this.isCurrentMonth(date);
-    const isToday = this.isToday(date);
-    const dateKey = this.formatDateKey(date);
-    const dayEvents = this.events[dateKey] || [];
+// Update fungsi renderDay untuk menampilkan status indicator
+renderDay(date) {
+  const isCurrentMonth = this.isCurrentMonth(date);
+  const isToday = this.isToday(date);
+  const dateKey = this.formatDateKey(date);
+  const dayEvents = this.events[dateKey] || [];
 
-    const bgClass = isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400';
-    const dateClass = isToday
-      ? 'flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 font-semibold text-white'
-      : '';
+  const bgClass = isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400';
+  const dateClass = isToday
+    ? 'flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 font-semibold text-white'
+    : '';
 
-    const minHeight = Math.max(96, 32 + (dayEvents.length * 20)); 
+  const minHeight = Math.max(96, 32 + (dayEvents.length * 20)); 
+  
+  let eventsHtml = '';
+  if (dayEvents.length > 0) {
+    const visibleEvents = dayEvents.slice(0, 3);
+    const hiddenCount = dayEvents.length - 3;
     
-    let eventsHtml = '';
-    if (dayEvents.length > 0) {
-      const visibleEvents = dayEvents.slice(0, 3);
-      const hiddenCount = dayEvents.length - 3;
-      
-      eventsHtml = `
-        <ol class="mt-1 space-y-0.5">
-          ${visibleEvents.map(event => {
-            const colors = this.getImplementorColor(event.implementor);
-            return `
-              <li>
-                <button type="button" class="group flex w-full text-left task-event rounded px-1 py-0.5 ${colors.bg} ${colors.border} border ${colors.hover}" data-task='${JSON.stringify(event)}'>
-                  <p class="flex-auto truncate text-xs font-medium ${colors.text} group-hover:opacity-80">${event.title}</p>
-                  <time datetime="${event.datetime}" class="ml-1 hidden flex-none text-xs ${colors.text} group-hover:opacity-80 xl:block">${event.time}</time>
-                </button>
-              </li>
-            `;
-          }).join('')}
-          ${hiddenCount > 0 ? `
+    eventsHtml = `
+      <ol class="mt-1 space-y-0.5">
+        ${visibleEvents.map(event => {
+          const colors = this.getImplementorColor(event.implementor);
+          const statusBadge = this.getStatusBadgeClass(event.status);
+          return `
             <li>
-              <button type="button" class="w-full text-left text-xs text-gray-500 hover:text-gray-700 px-1 py-0.5 more-events" data-date="${dateKey}">
-                +${hiddenCount} more
+              <button type="button" class="group flex w-full text-left task-event rounded px-1 py-0.5 ${colors.bg} ${colors.border} border ${colors.hover} relative" data-task='${JSON.stringify(event)}'>
+                <div class="flex-1 min-w-0">
+                  <p class="flex-auto truncate text-xs font-medium ${colors.text} group-hover:opacity-80">${event.title}</p>
+                  <div class="flex items-center gap-1 mt-0.5">
+                    <span class="inline-block w-2 h-2 rounded-full ${event.status === 'completed' ? 'bg-green-500' : event.status === 'scheduled' ? 'bg-blue-500' : event.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-500'}"></span>
+                    <time datetime="${event.datetime}" class="text-xs ${colors.text} opacity-75">${event.time}</time>
+                  </div>
+                </div>
               </button>
             </li>
-          ` : ''}
-        </ol>
-      `;
-    }
-
-    return `
-      <div class="relative ${bgClass} px-2 py-2 flex flex-col border-b border-gray-100" style="min-height: ${minHeight}px;">
-        <time datetime="${dateKey}" class="${dateClass} mb-1">${date.getDate()}</time>
-        <div class="flex-1">
-          ${eventsHtml}
-        </div>
-      </div>
+          `;
+        }).join('')}
+        ${hiddenCount > 0 ? `
+          <li>
+            <button type="button" class="w-full text-left text-xs text-gray-500 hover:text-gray-700 px-1 py-0.5 more-events" data-date="${dateKey}">
+              +${hiddenCount} more
+            </button>
+          </li>
+        ` : ''}
+      </ol>
     `;
   }
 
-  showMoreEvents(dateKey) {
-    const dayEvents = this.events[dateKey] || [];
-    const modal = document.getElementById('taskModal');
-    const modalContent = document.getElementById('modal-content');
-    
-    modalContent.innerHTML = `
-      <div class="space-y-3">
-        <h4 class="font-medium text-gray-900">Events for ${dateKey}</h4>
-        <div class="space-y-2 max-h-96 overflow-y-auto">
-          ${dayEvents.map(event => {
-            const colors = this.getImplementorColor(event.implementor);
-            return `
-              <div class="border rounded-lg p-3 ${colors.hover} cursor-pointer task-event ${colors.bg} ${colors.border}" data-task='${JSON.stringify(event)}'>
-                <div class="flex justify-between items-start">
-                  <h5 class="font-medium ${colors.text}">${event.title}</h5>
-                  <span class="text-xs ${colors.text} opacity-75">${event.time}</span>
-                </div>
-                <p class="text-sm text-gray-600 mt-1">${event.description || 'No description'}</p>
-                <div class="flex gap-4 mt-2 text-xs text-gray-500">
-                  <span>📍 ${event.place}</span>
-                  <span class="${this.getImplementorBadgeClass(event.implementor)}">👤 ${event.implementor}</span>
-                </div>
+  return `
+    <div class="relative ${bgClass} px-2 py-2 flex flex-col border-b border-gray-100" style="min-height: ${minHeight}px;">
+      <time datetime="${dateKey}" class="${dateClass} mb-1">${date.getDate()}</time>
+      <div class="flex-1">
+        ${eventsHtml}
+      </div>
+    </div>
+  `;
+}
+
+  // Update fungsi showMoreEvents untuk menampilkan status
+showMoreEvents(dateKey) {
+  const dayEvents = this.events[dateKey] || [];
+  const modal = document.getElementById('taskModal');
+  const modalContent = document.getElementById('modal-content');
+  
+  modalContent.innerHTML = `
+    <div class="space-y-3">
+      <h4 class="font-medium text-gray-900">Events for ${dateKey}</h4>
+      <div class="space-y-2 max-h-96 overflow-y-auto">
+        ${dayEvents.map(event => {
+          const colors = this.getImplementorColor(event.implementor);
+          const statusBadge = this.getStatusBadgeClass(event.status);
+          return `
+            <div class="border rounded-lg p-3 ${colors.hover} cursor-pointer task-event ${colors.bg} ${colors.border}" data-task='${JSON.stringify(event)}'>
+              <div class="flex justify-between items-start">
+                <h5 class="font-medium ${colors.text}">${event.title}</h5>
+                <span class="text-xs ${colors.text} opacity-75">${event.time}</span>
               </div>
-            `;
-          }).join('')}
-        </div>
+              <p class="text-sm text-gray-600 mt-1">${event.description || 'No description'}</p>
+              <div class="flex gap-4 mt-2 text-xs">
+                <span class="text-gray-500">📍 ${event.place}</span>
+                <span class="inline-block px-2 py-1 rounded-full ${statusBadge}">
+                  ${event.status}
+                </span>
+                <span class="${this.getImplementorBadgeClass(event.implementor)}">👤 ${event.implementor}</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
       </div>
-    `;
-    
-    modal.classList.remove('hidden');
-  }
+    </div>
+  `;
+  
+  modal.classList.remove('hidden');
+}
 
   render() {
     this.updateHeaderDate(); 
