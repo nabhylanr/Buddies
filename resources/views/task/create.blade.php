@@ -60,8 +60,17 @@
                     class="appearance-none w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none pr-10">
                     <option value="">Pilih Perusahaan</option>
                     @foreach($recaps as $recap)
-                      <option value="{{ $recap->id }}" {{ old('recap_id') == $recap->id ? 'selected' : '' }}>
+                      <option value="{{ $recap->id }}" 
+                              {{ old('recap_id') == $recap->id ? 'selected' : '' }}
+                              data-status="{{ $recap->status }}">
                         {{ $recap->nama_perusahaan }} - {{ $recap->cabang }}
+                        @if($recap->status === 'completed')
+                          <span class="text-green-600">(Selesai)</span>
+                        @elseif($recap->status === 'scheduled')
+                          <span class="text-yellow-600">(Terjadwal)</span>
+                        @else
+                          <span class="text-gray-600">(Pending)</span>
+                        @endif
                       </option>
                     @endforeach
                   </select>
@@ -72,15 +81,8 @@
                     </svg>
                   </div>
                 </div>
-              </div>
-
-              <!-- Description Field (Add this if it's missing) -->
-              <div class="col-span-full">
-                <label for="description" class="block text-sm font-medium text-gray-900">Deskripsi Task</label>
-                <div class="mt-2">
-                  <textarea name="description" id="description" rows="3" required
-                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none"
-                    placeholder="Masukkan deskripsi task...">{{ old('description') }}</textarea>
+                <div id="company-status-info" class="mt-2 text-sm hidden">
+                  <span id="status-message"></span>
                 </div>
               </div>
 
@@ -152,6 +154,16 @@
                 </div>
               </div>
 
+              <!-- Description Field -->
+              <div class="col-span-full">
+                <label for="description" class="block text-sm font-medium text-gray-900">Informasi Tempat</label>
+                <div class="mt-2">
+                  <textarea name="description" id="description" rows="3" required
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none"
+                    placeholder="Masukkan informasi tempat...">{{ old('description') }}</textarea>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -175,10 +187,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const timeSelect = document.getElementById('time');
     const timeConflictMessage = document.getElementById('time-conflict-message');
     const submitBtn = document.getElementById('submit-btn');
+    const recapSelect = document.getElementById('recap_id');
+    const companyStatusInfo = document.getElementById('company-status-info');
+    const statusMessage = document.getElementById('status-message');
 
     // Determine the correct API endpoint based on user role
     const isUser = {{ Auth::user()->isUser() ? 'true' : 'false' }};
     const apiEndpoint = isUser ? '/api/user/available-time-slots' : '/api/tasks/available-time-slots';
+
+    // Show company status information
+    recapSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.value) {
+            const status = selectedOption.dataset.status;
+            let statusText = '';
+            let statusClass = '';
+
+            switch(status) {
+                case 'completed':
+                    statusText = 'Perusahaan ini sudah memiliki task yang selesai. Anda dapat menambahkan task baru.';
+                    statusClass = 'text-green-600';
+                    break;
+                case 'scheduled':
+                    statusText = 'Perusahaan ini sudah memiliki task yang terjadwal.';
+                    statusClass = 'text-yellow-600';
+                    break;
+                default:
+                    statusText = 'Perusahaan ini belum memiliki task yang dijadwalkan.';
+                    statusClass = 'text-gray-600';
+            }
+
+            statusMessage.textContent = statusText;
+            statusMessage.className = statusClass;
+            companyStatusInfo.classList.remove('hidden');
+        } else {
+            companyStatusInfo.classList.add('hidden');
+        }
+    });
 
     function checkAvailableTimeSlots() {
         const implementor = implementorSelect.value;

@@ -386,7 +386,7 @@ class RealTimeCalendar {
             <p class="text-sm text-gray-900">${task.place}</p>
           </div>
           <div>
-              <span class="text-sm font-medium text-gray-700">Description:</span>
+              <span class="text-sm font-medium text-gray-700">Place Information:</span>
               <p class="text-sm text-gray-900 capitalize">${task.description}</p>
           </div>
         </div>

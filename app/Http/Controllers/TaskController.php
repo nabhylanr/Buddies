@@ -11,10 +11,23 @@ use Illuminate\Validation\ValidationException;
 class TaskController extends Controller
 {
     public function create()
-    {
-        $recaps = Recap::orderBy('nama_perusahaan', 'asc')->get();
-        return view('task.create', compact('recaps'));
-    }
+{
+    // Ubah query untuk mengurutkan berdasarkan id (urutan penambahan)
+    // atau created_at jika kolom tersebut ada
+    $recaps = Recap::whereIn('status', ['pending', 'scheduled'])
+                  ->orderBy('id', 'asc') // Mengurutkan berdasarkan ID (yang ditambahkan duluan)
+                  ->get();
+    
+    // Alternatif jika tabel recap memiliki kolom created_at:
+    // $recaps = Recap::whereIn('status', ['pending', 'scheduled'])
+    //               ->orderBy('created_at', 'asc')
+    //               ->get();
+    
+    // Jika ingin menampilkan semua recap termasuk yang completed, gunakan:
+    // $recaps = Recap::orderBy('id', 'asc')->get();
+    
+    return view('task.create', compact('recaps'));
+}
 
     public function store(Request $request)
     {
@@ -40,8 +53,9 @@ class TaskController extends Controller
         ]);
 
         // Update status Recap menjadi "scheduled"
+        // Jika recap sudah completed, biarkan tetap completed dan buat task baru
         $recap = Recap::find($request->recap_id);
-        if ($recap && $recap->status !== 'completed') {
+        if ($recap && $recap->status === 'pending') {
             $recap->status = 'scheduled';
             $recap->save();
         }
@@ -152,13 +166,13 @@ class TaskController extends Controller
         return view('task.show', compact('task'));
     }
 
-    // Fixed edit method - now accepts Task model directly
     public function edit(Task $task)
-    {
-        $task->load('recap');
-        $recaps = Recap::orderBy('nama_perusahaan', 'asc')->get();
-        return view('task.edit', compact('task', 'recaps'));
-    }
+{
+    $task->load('recap');
+    // Untuk edit, tampilkan semua recap dan urutkan berdasarkan urutan penambahan
+    $recaps = Recap::orderBy('id', 'asc')->get();
+    return view('task.edit', compact('task', 'recaps'));
+}
 
     public function update(Request $request, Task $task)
     {
@@ -186,7 +200,6 @@ class TaskController extends Controller
             ->with('success', 'Task berhasil diperbarui!');
     }
 
-    // Fixed destroy method - now accepts Task model directly
     public function destroy(Task $task)
     {
         $task->delete();

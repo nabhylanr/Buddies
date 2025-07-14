@@ -42,7 +42,7 @@
       </div>
 
       <!-- Statistics Bar -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
           <div class="flex items-center justify-between">
             <div>
@@ -82,19 +82,6 @@
             </div>
           </div>
         </div>
-        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-purple-100 text-sm">Mendatang</p>
-              <p class="text-2xl font-bold">{{ $upcomingTasks }}</p>
-            </div>
-            <div class="text-purple-200">
-              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
       </div>
 
       @if(session('success'))
@@ -123,11 +110,6 @@
                   :class="currentFilter === 'week' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
                   class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             Minggu Ini
-          </button>
-          <button @click="currentFilter = 'upcoming'; filterTasks('upcoming')" 
-                  :class="currentFilter === 'upcoming' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
-                  class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-            Mendatang
           </button>
         </div>
       </div>
