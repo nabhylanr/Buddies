@@ -35,7 +35,14 @@
         </div>
       @endif
 
-      <form action="{{ route('tasks.store') }}" method="POST">
+      <!-- Dynamic form action based on user role -->
+      @php
+        $user = Auth::user();
+        $formAction = $user->isUser() ? route('user.task.store') : route('tasks.store');
+        $backUrl = $user->isUser() ? route('calendar.index') : route('tasks.index');
+      @endphp
+
+      <form action="{{ $formAction }}" method="POST">
         @csrf
 
         <div class="space-y-12">
@@ -64,6 +71,16 @@
                             d="M7 7l3-3 3 3m0 6l-3 3-3-3"/>
                     </svg>
                   </div>
+                </div>
+              </div>
+
+              <!-- Description Field (Add this if it's missing) -->
+              <div class="col-span-full">
+                <label for="description" class="block text-sm font-medium text-gray-900">Deskripsi Task</label>
+                <div class="mt-2">
+                  <textarea name="description" id="description" rows="3" required
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none"
+                    placeholder="Masukkan deskripsi task...">{{ old('description') }}</textarea>
                 </div>
               </div>
 
@@ -135,14 +152,12 @@
                 </div>
               </div>
 
-              
-
             </div>
           </div>
         </div>
 
         <div class="mt-6 flex items-center justify-end gap-x-6">
-          <a href="{{ route('tasks.index') }}" class="text-sm font-semibold text-gray-700 hover:underline">Kembali</a>
+          <a href="{{ $backUrl }}" class="text-sm font-semibold text-gray-700 hover:underline">Kembali</a>
           <button type="submit" id="submit-btn"
             class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-gray-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gray-700">
             Simpan Task
@@ -161,6 +176,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const timeConflictMessage = document.getElementById('time-conflict-message');
     const submitBtn = document.getElementById('submit-btn');
 
+    // Determine the correct API endpoint based on user role
+    const isUser = {{ Auth::user()->isUser() ? 'true' : 'false' }};
+    const apiEndpoint = isUser ? '/api/user/available-time-slots' : '/api/tasks/available-time-slots';
+
     function checkAvailableTimeSlots() {
         const implementor = implementorSelect.value;
         const date = dateInput.value;
@@ -173,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSelect.disabled = true;
         timeSelect.innerHTML = '<option value="">Mengecek ketersediaan...</option>';
 
-        fetch(`/api/tasks/available-time-slots?implementor=${implementor}&date=${date}`)
+        fetch(`${apiEndpoint}?implementor=${implementor}&date=${date}`)
             .then(response => response.json())
             .then(data => {
                 updateTimeOptions(data.available_slots, data.used_slots);

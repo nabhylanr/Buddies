@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function () {
         return view('settings');
     });
 
+    // Admin/Implementor Task Routes
     Route::get('/tasks', function (Request $request) {
         $user = Auth::user();
         if (!$user->canAccessTasks()) {
@@ -148,15 +149,56 @@ Route::middleware('auth')->group(function () {
         return $controller->destroy($task); 
     })->name('tasks.destroy');
 
+    // USER-SPECIFIC ROUTES FOR TASK CREATION
     Route::get('/user/create', function () {
         $user = Auth::user();
-        if (!$user->canAccessMeetings()) {
+        // Allow users to create tasks (change permission check)
+        if (!$user->isUser()) {
             return redirect('/dashboard')->with('error', 'You do not have permission to access this page.');
         }
         $controller = app(TaskController::class);
         return $controller->create();
-    })->name('task.create');
+    })->name('user.task.create');
 
+    Route::post('/user/create', function () {
+        $user = Auth::user();
+        // Allow users to store tasks
+        if (!$user->isUser()) {
+            return redirect('/dashboard')->with('error', 'You do not have permission to access this page.');
+        }
+        $controller = app(TaskController::class);
+        return $controller->store(request());
+    })->name('user.task.store');
+
+    // User-specific API endpoint for time slots
+    Route::get('/api/user/available-time-slots', function () {
+        $user = Auth::user();
+        if (!$user->isUser()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        $controller = app(TaskController::class);
+        return $controller->getAvailableTimeSlots();
+    });
+
+    // USER-SPECIFIC ROUTES FOR RECAPS (READ ONLY)
+    Route::get('/user/recaps', function (Request $request) {
+        $user = Auth::user();
+        if (!$user->isUser()) {
+            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
+        }
+        return app(RecapController::class)->view($request); 
+    })->name('user.recaps.user');
+
+    Route::get('/user/recaps/{recap}', function (Recap $recap) {
+        $user = Auth::user();
+        if (!$user->isUser()) {
+            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
+        }
+        $controller = app(RecapController::class);
+        return $controller->show($recap);
+    })->name('user.recaps.show');
+
+    // ADMIN/IMPLEMENTOR RECAP ROUTES (FULL ACCESS)
     Route::get('/recaps', function (Request $request) {
         $user = Auth::user();
         if (!$user->canAccessRecaps()) {

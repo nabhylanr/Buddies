@@ -99,4 +99,37 @@ class RecapController extends Controller
         return redirect()->route('recaps.index')
             ->with('success', 'Recap berhasil dihapus!');
     }
+
+    public function view(Request $request)
+    {
+        $query = Recap::query();
+
+        if ($request->filled('company_id')) {
+            $query->where('company_id', 'like', '%' . $request->company_id . '%');
+        }
+
+        if ($request->filled('nama_perusahaan')) {
+            $query->where('nama_perusahaan', 'like', '%' . $request->nama_perusahaan . '%');
+        }
+
+        if ($request->filled('cabang')) {
+            $query->where('cabang', $request->cabang);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $recaps = $query->latest()->paginate(10);
+        $cabangList = Recap::select('cabang')->distinct()->pluck('cabang');
+        $statusList = Recap::select('status')->distinct()->pluck('status');
+
+        return view('recaps.user', [
+            'recaps' => $recaps,
+            'cabangList' => $cabangList,
+            'statusList' => $statusList,
+        ]);
+    }
+
+    
 }
