@@ -46,14 +46,14 @@
       Profile
     </a>
     @elseif(Auth::user()->isUser())
-    <a href="/user/create" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 hover:text-black transition">
-      Meetings
-    </a>
     <a href="/calendar" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 hover:text-black transition">
       Calendar
     </a>
     <a href="/user/recaps" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 hover:text-black transition">
       Recap
+    </a>
+    <a href="/user/create" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 hover:text-black transition">
+      Meetings
     </a>
     <a href="/profile" class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 hover:text-black transition">
       Profile

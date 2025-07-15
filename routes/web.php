@@ -34,8 +34,23 @@ Route::middleware('auth')->group(function () {
         return view('profile');
     })->name('profile');
 
-    Route::get('/overdue-tasks', [TaskController::class, 'getOverdueTasks'])->name('tasks.overdue');
-    Route::post('/mark-overdue-notified', [TaskController::class, 'markOverdueNotified'])->name('tasks.mark-overdue-notified');
+    Route::get('/overdue-tasks', function () {
+        $user = Auth::user();
+        if (!$user->canAccessTasks()) {
+            return response()->json(['error' => 'You do not have permission to access this page.'], 403);
+        }
+        $controller = app(TaskController::class);
+        return $controller->getOverdueTasks();
+    })->name('tasks.overdue');
+
+    Route::post('/mark-overdue-notified', function () {
+        $user = Auth::user();
+        if (!$user->canAccessTasks()) {
+            return response()->json(['error' => 'You do not have permission to access this page.'], 403);
+        }
+        $controller = app(TaskController::class);
+        return $controller->markOverdueNotified(request());
+    })->name('tasks.mark-overdue-notified');
 
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
     Route::get('/calendar/events', [CalendarController::class, 'getEvents'])->name('calendar.events');
@@ -53,7 +68,6 @@ Route::middleware('auth')->group(function () {
         return view('settings');
     });
 
-    // Admin/Implementor Task Routes
     Route::get('/tasks', function (Request $request) {
         $user = Auth::user();
         if (!$user->canAccessTasks()) {
