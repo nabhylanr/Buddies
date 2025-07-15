@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 class TaskController extends Controller
 {
     public function create()
-{
+    {
     // Ubah query untuk mengurutkan berdasarkan id (urutan penambahan)
     // atau created_at jika kolom tersebut ada
     $recaps = Recap::whereIn('status', ['pending', 'scheduled'])
@@ -27,7 +27,7 @@ class TaskController extends Controller
     // $recaps = Recap::orderBy('id', 'asc')->get();
     
     return view('task.create', compact('recaps'));
-}
+    }
 
     public function store(Request $request)
     {
@@ -52,8 +52,6 @@ class TaskController extends Controller
             'status' => 'pending',
         ]);
 
-        // Update status Recap menjadi "scheduled"
-        // Jika recap sudah completed, biarkan tetap completed dan buat task baru
         $recap = Recap::find($request->recap_id);
         if ($recap && $recap->status === 'pending') {
             $recap->status = 'scheduled';
@@ -71,7 +69,6 @@ class TaskController extends Controller
             'completed_at' => Carbon::now('Asia/Jakarta')
         ]);
 
-        // Jika semua task recap sudah selesai, set recap ke "completed"
         $recap = $task->recap;
         if ($recap) {
             $hasOtherPending = $recap->tasks()->where('status', '!=', 'completed')->exists();
@@ -169,7 +166,6 @@ class TaskController extends Controller
     public function edit(Task $task)
 {
     $task->load('recap');
-    // Untuk edit, tampilkan semua recap dan urutkan berdasarkan urutan penambahan
     $recaps = Recap::orderBy('id', 'asc')->get();
     return view('task.edit', compact('task', 'recaps'));
 }
@@ -262,26 +258,30 @@ class TaskController extends Controller
     }
 
     public function dashboard()
-    {
-        $today = Carbon::today('Asia/Jakarta');
-        $startOfWeek = $today->copy()->startOfWeek();
-        $endOfWeek = $today->copy()->endOfWeek();
+{
+    $today = Carbon::today('Asia/Jakarta');
+    $now = Carbon::now('Asia/Jakarta');
+    $startOfWeek = $today->copy()->startOfWeek();
+    $endOfWeek = $today->copy()->endOfWeek();
 
-        $tasks = Task::with('recap')
-            ->where('status', 'pending')
-            ->orderBy('datetime', 'asc')
-            ->get();
+    $tasks = Task::with('recap')
+        ->where('status', 'pending')
+        ->orderBy('datetime', 'asc')
+        ->get();
 
-        $totalTasks = $tasks->count();
+    $totalTasks = $tasks->count();
 
-        $todayTasks = $tasks->filter(fn($task) => $task->datetime->setTimezone('Asia/Jakarta')->isSameDay($today))->count();
+    $todayTasks = $tasks->filter(fn($task) => $task->datetime->setTimezone('Asia/Jakarta')->isSameDay($today))->count();
 
-        $weekTasks = $tasks->filter(fn($task) => $task->datetime->between($startOfWeek, $endOfWeek))->count();
+    $weekTasks = $tasks->filter(fn($task) => $task->datetime->between($startOfWeek, $endOfWeek))->count();
 
-        $upcomingTasks = $tasks->filter(fn($task) => $task->datetime->isAfter($today))->count();
+    $upcomingTasks = $tasks->filter(fn($task) => $task->datetime->isAfter($today))->count();
 
-        return view('dashboard', compact('tasks', 'totalTasks', 'todayTasks', 'weekTasks', 'upcomingTasks'));
-    }
+    // Add overdue tasks calculation
+    $overdueTasks = $tasks->filter(fn($task) => $task->datetime->isBefore($now))->count();
+
+    return view('dashboard', compact('tasks', 'totalTasks', 'todayTasks', 'weekTasks', 'upcomingTasks', 'overdueTasks'));
+}
 
    public function getOverdueTasks() {
     $now = Carbon::now('Asia/Jakarta');
@@ -307,17 +307,15 @@ class TaskController extends Controller
     });
     
     return response()->json($formattedTasks);
-}
+    }
 
-public function markOverdueNotified(Request $request) {
-    $now = Carbon::now('Asia/Jakarta'); // Definisikan variabel $now di sini
-    $taskIds = $request->input('task_ids', []);
-    
-    // Optional: Bisa tambah kolom 'overdue_notified_at' di tabel tasks
-    // untuk track kapan user sudah di-notify
-    Task::whereIn('id', $taskIds)
-        ->update(['overdue_notified_at' => $now]);
-    
-    return response()->json(['success' => true]);
-}
+    public function markOverdueNotified(Request $request) {
+        $now = Carbon::now('Asia/Jakarta'); 
+        $taskIds = $request->input('task_ids', []);
+        
+        Task::whereIn('id', $taskIds)
+            ->update(['overdue_notified_at' => $now]);
+        
+        return response()->json(['success' => true]);
+    }
 }

@@ -152,10 +152,8 @@ Route::middleware('auth')->group(function () {
         return $controller->destroy($task); 
     })->name('tasks.destroy');
 
-    // USER-SPECIFIC ROUTES FOR TASK CREATION
     Route::get('/user/create', function () {
         $user = Auth::user();
-        // Allow users to create tasks (change permission check)
         if (!$user->isUser()) {
             return redirect('/dashboard')->with('error', 'You do not have permission to access this page.');
         }
@@ -165,7 +163,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/user/create', function () {
         $user = Auth::user();
-        // Allow users to store tasks
         if (!$user->isUser()) {
             return redirect('/dashboard')->with('error', 'You do not have permission to access this page.');
         }
@@ -173,7 +170,6 @@ Route::middleware('auth')->group(function () {
         return $controller->store(request());
     })->name('user.task.store');
 
-    // User-specific API endpoint for time slots
     Route::get('/api/user/available-time-slots', function () {
         $user = Auth::user();
         if (!$user->isUser()) {
@@ -183,7 +179,6 @@ Route::middleware('auth')->group(function () {
         return $controller->getAvailableTimeSlots();
     });
 
-    // USER-SPECIFIC ROUTES FOR RECAPS (READ ONLY)
     Route::get('/user/recaps', function (Request $request) {
         $user = Auth::user();
         if (!$user->isUser()) {
@@ -201,7 +196,6 @@ Route::middleware('auth')->group(function () {
         return $controller->show($recap);
     })->name('user.recaps.show');
 
-    // ADMIN/IMPLEMENTOR RECAP ROUTES (FULL ACCESS)
     Route::get('/recaps', function (Request $request) {
         $user = Auth::user();
         if (!$user->canAccessRecaps()) {

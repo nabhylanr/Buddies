@@ -679,16 +679,13 @@ function showOverduePopup(overdueTasks) {
                 <div class="flex items-start">
                     <span class="mr-2 text-sm">${urgencyIcon}</span>
                     <div class="flex-1 text-xs">
-                        <p class="font-semibold text-gray-900">${task.company_name}</p>
+                        <p class="font-semibold text-sm text-gray-900">${task.company_name}</p>
                         <p class="text-gray-600">${task.description}</p>
                         <div class="mt-1 text-gray-500">
                             <span>${task.datetime}</span>
                             <span>${task.place}</span> 
                             <span>${task.implementor}</span>
                         </div>
-                        <p class="mt-1 ${urgencyClass} font-medium">
-                            Terlambat ${task.overdue_days} hari ${task.overdue_hours % 24} jam
-                        </p>
                     </div>
                 </div>
             </div>

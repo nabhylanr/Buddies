@@ -42,7 +42,7 @@
       </div>
 
       <!-- Statistics Bar -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
           <div class="flex items-center justify-between">
             <div>
@@ -82,6 +82,19 @@
             </div>
           </div>
         </div>
+        <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-4 text-white">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-red-100 text-sm">Overdue</p>
+              <p class="text-2xl font-bold">{{ $overdueTasks }}</p>
+            </div>
+            <div class="text-red-200">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
       @if(session('success'))
@@ -92,6 +105,26 @@
           {{ session('success') }}
         </div>
       @endif
+
+      <!-- Overdue Tasks Alert -->
+        @if($overdueTasks > 0)
+        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="text-red-800 font-semibold text-base">
+                Peringatan: Ada {{ $overdueTasks }} task yang overdue!
+                </h3>
+                <p class="text-red-600 text-xs">
+                Segera selesaikan task yang sudah melewati deadline.
+                </p>
+            </div>
+            </div>
+        </div>
+        @endif
+
 
       <!-- Filter Options -->
       <div class="mb-6" x-data="{ currentFilter: 'all' }">
@@ -110,6 +143,11 @@
                   :class="currentFilter === 'week' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
                   class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             Minggu Ini
+          </button>
+          <button @click="currentFilter = 'overdue'; filterTasks('overdue')" 
+                  :class="currentFilter === 'overdue' ? 'bg-red-800 text-white' : 'bg-white text-red-600 text-sm font-semibold shadow-sm ring-1 ring-inset ring-red-300 hover:bg-red-50'"
+                  class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            Overdue
           </button>
         </div>
       </div>
@@ -141,7 +179,8 @@
               @foreach($tasks as $task)
                 <div class="task-item p-6 hover:bg-gray-50 transition-colors duration-200"
                      data-date="{{ $task->datetime->format('Y-m-d') }}"
-                     data-datetime="{{ $task->datetime->format('Y-m-d H:i:s') }}">
+                     data-datetime="{{ $task->datetime->format('Y-m-d H:i:s') }}"
+                     data-is-overdue="{{ $task->isOverdue() ? 'true' : 'false' }}">
                   <div class="flex items-start space-x-4">
                     <!-- Checkbox -->
                     <form action="{{ route('tasks.complete', $task->id) }}" method="POST" class="inline">
@@ -156,41 +195,55 @@
 
                     <!-- Task Content -->
                     <div class="flex-1 min-w-0"> 
-                    <div class="flex items-center justify-between"> 
+                      <div class="flex items-center justify-between"> 
                         <div class="flex-1">
-                        <h4 class="text-s font-semibold text-gray-800 mb-0.5">{{ $task->title ?? $task->description }}</h4> 
-                        <div class="flex items-center space-x-3 text-xs text-gray-500">
-                            <span>{{ $task->datetime->format('d/m/Y H:i') }}</span>
+                          <h4 class="text-s font-semibold text-gray-800 mb-0.5">{{ $task->title ?? $task->description }}</h4> 
+                          <div class="flex items-center space-x-3 text-xs text-gray-500">
+                            <span class="{{ $task->isOverdue() ? 'text-red-600 font-semibold' : '' }}">
+                              {{ $task->datetime->format('d/m/Y H:i') }}
+                              @if($task->isOverdue())
+                                <span class="text-red-500 ml-1">({{ $task->overdue_duration }})</span>
+                              @endif
+                            </span>
                             <span>{{ $task->place }}</span>
                             <span>{{ $task->implementor }}</span>
-                        </div>
+                          </div>
+                          @if($task->isOverdue())
+                            <div class="mt-1">
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                Overdue
+                              </span>
+                            </div>
+                          @endif
                         </div>
                         
                         <!-- Action Buttons -->
                         <div class="flex items-center space-x-2 ml-2">
-                        <a href="{{ route('tasks.edit', $task->id) }}"
-                            class="text-gray-400 hover:text-gray-700 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                        </a>
-                        <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                    class="text-gray-400 hover:text-red-600 transition"
-                                    onclick="return confirm('Yakin ingin menghapus task ini?')">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <a href="{{ route('tasks.edit', $task->id) }}"
+                              class="text-gray-400 hover:text-gray-700 transition">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            </button>
-                        </form>
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                          </a>
+                          <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" class="inline">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit"
+                                      class="text-gray-400 hover:text-red-600 transition"
+                                      onclick="return confirm('Yakin ingin menghapus task ini?')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                              </button>
+                          </form>
                         </div>
+                      </div>
                     </div>
-                    </div>
-
                   </div>
                 </div>
               @endforeach
@@ -216,6 +269,7 @@ function filterTasks(filter) {
   taskItems.forEach(item => {
     const taskDatetime = new Date(item.dataset.datetime);
     const taskDate = new Date(taskDatetime.getFullYear(), taskDatetime.getMonth(), taskDatetime.getDate());
+    const isOverdue = item.dataset.isOverdue === 'true';
     let shouldShow = false;
     
     switch(filter) {
@@ -231,6 +285,10 @@ function filterTasks(filter) {
         endOfWeek.setDate(startOfWeek.getDate() + 6);
         
         shouldShow = taskDate >= startOfWeek && taskDate <= endOfWeek;
+        break;
+        
+      case 'overdue':
+        shouldShow = isOverdue;
         break;
         
       case 'upcoming':

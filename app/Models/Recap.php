@@ -15,22 +15,19 @@ class Recap extends Model
         'cabang',
         'sales',
         'keterangan',
-        'status' // Tambahkan status ke fillable
+        'status' 
     ];
 
-    // Relasi dengan Task (satu recap bisa punya banyak task)
     public function tasks()
     {
         return $this->hasMany(Task::class);
     }
 
-    // Accessor untuk mendapatkan format nama perusahaan lengkap
     public function getFullCompanyNameAttribute()
     {
         return $this->nama_perusahaan . ' - ' . $this->cabang;
     }
 
-    // Scope untuk filter berdasarkan status
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
@@ -46,7 +43,6 @@ class Recap extends Model
         return $query->where('status', 'completed');
     }
 
-    // Method untuk mengupdate status
     public function markAsCompleted()
     {
         $this->update(['status' => 'completed']);
@@ -62,7 +58,6 @@ class Recap extends Model
         $this->update(['status' => 'pending']);
     }
 
-    // Status checkers
     public function isCompleted()
     {
         return $this->status === 'completed';
