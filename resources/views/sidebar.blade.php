@@ -19,7 +19,7 @@
       <span class="text-gray-700 font-semibold text-lg">{{ substr(Auth::user()->name, 0, 1) }}</span>
     </div>
     <p class="font-medium">{{ Auth::user()->name }}</p>
-    <p class="text-xs text-gray-500 mt-1">{{ ucfirst(Auth::user()->role) }}</p>
+    <p class="text-xs text-gray-500">{{ ucfirst(Auth::user()->role) }}</p>
   </div>
   @endauth
 
