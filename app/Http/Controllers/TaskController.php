@@ -282,4 +282,42 @@ class TaskController extends Controller
 
         return view('dashboard', compact('tasks', 'totalTasks', 'todayTasks', 'weekTasks', 'upcomingTasks'));
     }
+
+   public function getOverdueTasks() {
+    $now = Carbon::now('Asia/Jakarta');
+    
+    $overdueTasks = Task::with('recap')
+        ->where('status', 'pending')
+        ->where('datetime', '<', $now)
+        ->orderBy('datetime', 'asc')
+        ->get();
+    
+    $formattedTasks = $overdueTasks->map(function ($task) use ($now) {
+        return [
+            'id' => $task->id,
+            'title' => $task->title,
+            'description' => $task->description,
+            'datetime' => $task->datetime->setTimezone('Asia/Jakarta')->format('d M Y H:i'),
+            'place' => $task->place,
+            'implementor' => $task->implementor,
+            'company_name' => $task->recap ? $task->recap->nama_perusahaan : 'Unknown',
+            'overdue_hours' => $task->datetime->diffInHours($now),
+            'overdue_days' => $task->datetime->diffInDays($now),
+        ];
+    });
+    
+    return response()->json($formattedTasks);
+}
+
+public function markOverdueNotified(Request $request) {
+    $now = Carbon::now('Asia/Jakarta'); // Definisikan variabel $now di sini
+    $taskIds = $request->input('task_ids', []);
+    
+    // Optional: Bisa tambah kolom 'overdue_notified_at' di tabel tasks
+    // untuk track kapan user sudah di-notify
+    Task::whereIn('id', $taskIds)
+        ->update(['overdue_notified_at' => $now]);
+    
+    return response()->json(['success' => true]);
+}
 }

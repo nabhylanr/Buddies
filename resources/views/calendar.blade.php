@@ -153,7 +153,7 @@
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
               <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Task Details</h3>
-              <div class="mt-2" id="modal-content">
+              <div class="mt-4" id="modal-content">
                 </div>
             </div>
           </div>
@@ -171,8 +171,8 @@
 <script>
 class RealTimeCalendar {
   constructor() {
-    this.viewDate = new Date(); // The date currently being viewed in the calendar
-    this.events = {}; // Store events fetched from the server
+    this.viewDate = new Date(); 
+    this.events = {}; 
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.monthNames = [
       'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -216,11 +216,11 @@ class RealTimeCalendar {
         this.events = await response.json();
       } else {
         console.error('Failed to load events:', response.statusText);
-        this.events = {}; // Clear events on error
+        this.events = {}; 
       }
     } catch (error) {
       console.error('Error loading events:', error);
-      this.events = {}; // Clear events on error
+      this.events = {}; 
     }
   }
 
@@ -228,19 +228,19 @@ class RealTimeCalendar {
     document.getElementById('prevMonth').addEventListener('click', () => {
       this.viewDate.setMonth(this.viewDate.getMonth() - 1);
       this.loadEventsAndRender();
-      this.updateDropdownContent(); // Keep dropdown in sync
+      this.updateDropdownContent(); 
     });
 
     document.getElementById('nextMonth').addEventListener('click', () => {
       this.viewDate.setMonth(this.viewDate.getMonth() + 1);
       this.loadEventsAndRender();
-      this.updateDropdownContent(); // Keep dropdown in sync
+      this.updateDropdownContent(); 
     });
 
     document.getElementById('todayBtn').addEventListener('click', () => {
       this.viewDate = new Date();
       this.loadEventsAndRender();
-      this.updateDropdownContent(); // Keep dropdown in sync
+      this.updateDropdownContent(); 
     });
 
     const menuButton = document.getElementById('menu-button');
@@ -360,7 +360,6 @@ class RealTimeCalendar {
     });
   }
 
-// Update fungsi showTaskDetails untuk menampilkan status yang tepat
 showTaskDetails(task) {
   const modal = document.getElementById('taskModal');
   const modalContent = document.getElementById('modal-content');
@@ -369,7 +368,7 @@ showTaskDetails(task) {
     <div class="space-y-4">
       <div>
         <h4 class="font-medium text-gray-900">${task.title}</h4>
-        <p class="text-sm text-gray-600 mt-1">${task.description || 'No description'}</p>
+        <p class="text-sm text-gray-600">${task.branch}</p>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
@@ -391,8 +390,8 @@ showTaskDetails(task) {
           <p class="text-sm text-gray-900">${task.place}</p>
         </div>
         <div>
-          <span class="text-sm font-medium text-gray-700">Company:</span>
-          <p class="text-sm text-gray-900">${task.company_name} - ${task.branch}</p>
+          <span class="text-sm font-medium text-gray-700">Place Information:</span>
+          <p class="text-sm text-gray-900">${task.description}</p>
         </div>
       </div>
       <div>
@@ -459,19 +458,18 @@ showTaskDetails(task) {
   }
 }
 
-// Tambahkan fungsi untuk mendapatkan badge color berdasarkan status
 getStatusBadgeClass(status) {
   switch (status) {
     case 'completed':
-      return 'bg-green-100 text-green-800 border-green-200';
+      return 'bg-green-100 text-green-800 border-green-200 text-xs font-medium px-2.5 py-0.5 rounded-sm';
     case 'scheduled':
-      return 'bg-blue-100 text-blue-800 border-blue-200';
+      return 'bg-blue-100 text-blue-800 border-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-sm';
     case 'pending':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200 text-xs font-medium px-2.5 py-0.5 rounded-sm';
     case 'cancelled':
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-red-100 text-red-800 border-red-200 text-xs font-medium px-2.5 py-0.5 rounded-sm';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-gray-100 text-gray-800 border-gray-200 text-xs font-medium px-2.5 py-0.5 rounded-sm';
   }
 }
 
@@ -507,7 +505,6 @@ getStatusBadgeClass(status) {
     return `${colors.bg} ${colors.text} text-xs font-medium px-2.5 py-0.5 rounded-sm`;
   }
 
-// Update fungsi renderDay untuk menampilkan status indicator
 renderDay(date) {
   const isCurrentMonth = this.isCurrentMonth(date);
   const isToday = this.isToday(date);
@@ -566,7 +563,6 @@ renderDay(date) {
   `;
 }
 
-  // Update fungsi showMoreEvents untuk menampilkan status
 showMoreEvents(dateKey) {
   const dayEvents = this.events[dateKey] || [];
   const modal = document.getElementById('taskModal');
@@ -643,6 +639,132 @@ showMoreEvents(dateKey) {
 document.addEventListener('DOMContentLoaded', () => {
   new RealTimeCalendar();
 });
+
+let notifiedTasks = new Set(); 
+
+document.addEventListener('DOMContentLoaded', function() {
+    checkOverdueTasks();
+    setInterval(checkOverdueTasks, 300000); 
+});
+
+function checkOverdueTasks() {
+    fetch('/overdue-tasks')
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const newOverdueTasks = data.filter(task => !notifiedTasks.has(task.id));
+                if (newOverdueTasks.length > 0) {
+                    showOverduePopup(newOverdueTasks);
+                    newOverdueTasks.forEach(task => notifiedTasks.add(task.id));
+                }
+            }
+        })
+        .catch(error => console.error('Error checking overdue tasks:', error));
+}
+
+function showOverduePopup(overdueTasks) {
+    let taskList = '';
+    let criticalCount = 0;
+    let regularCount = 0;
+    
+    overdueTasks.forEach(task => {
+        const urgencyClass = task.overdue_days > 1 ? 'text-red-800' : 'text-red-800';
+        const urgencyIcon = task.overdue_days > 1 ? '🚨' : '⚠️';
+        
+        if (task.overdue_days > 1) criticalCount++;
+        else regularCount++;
+        
+        taskList += `
+            <div class="border-l-4 ${task.overdue_days > 1 ? 'border-red-800' : 'border-red-800'} bg-gray-50 p-2 mb-3 rounded-md">
+                <div class="flex items-start">
+                    <span class="mr-2 text-sm">${urgencyIcon}</span>
+                    <div class="flex-1 text-xs">
+                        <p class="font-semibold text-gray-900">${task.company_name}</p>
+                        <p class="text-gray-600">${task.description}</p>
+                        <div class="mt-1 text-gray-500">
+                            <span>${task.datetime}</span>
+                            <span>${task.place}</span> 
+                            <span>${task.implementor}</span>
+                        </div>
+                        <p class="mt-1 ${urgencyClass} font-medium">
+                            Terlambat ${task.overdue_days} hari ${task.overdue_hours % 24} jam
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    const title = criticalCount > 0 ? 
+        `${criticalCount} Task Kritis Overdue!` : 
+        `${regularCount} Task Overdue`;
+    
+    const description = "Task-task berikut sudah melewati jadwal";
+    
+    const popupHTML = `
+        <div id="overduePopup" class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="max-w-md w-full">
+                    <div class="p-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
+                        <div class="flex items-center mb-2">
+                            <svg class="shrink-0 w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                            </svg>
+                            <h3 class="text-base font-semibold">${title}</h3>
+                        </div>
+                        <div class="mb-3 text-xs">${description}</div>
+                        <div class="max-h-64 overflow-y-auto mb-4 text-xs">
+                            ${taskList}
+                        </div>
+                        <div class="flex space-x-2">
+                            <button type="button" onclick="viewAllTasks()" class="text-white bg-red-800 hover:bg-red-900 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-4 py-2 inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                                <svg class="mr-2 h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                                    <path d="M10 0C4.612 0 0 5.336 0 7c0 1.742 3.546 7 10 7 6.454 0 10-5.258 10-7 0-1.664-4.612-7-10-7Zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/>
+                                </svg>
+                                Lihat Semua Task
+                            </button>
+                            <button type="button" onclick="closeOverduePopup()" class="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-4 py-2 dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+    
+    markOverdueNotified(overdueTasks.map(task => task.id));
+}
+
+function closeOverduePopup() {
+    const popup = document.getElementById('overduePopup');
+    if (popup) {
+        popup.remove();
+    }
+}
+
+function viewAllTasks() {
+    closeOverduePopup();
+    window.location.href = '/tasks?filter=overdue'; 
+}
+
+function markOverdueNotified(taskIds) {
+    fetch('/mark-overdue-notified', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ task_ids: taskIds })
+    })
+    .catch(error => console.error('Error marking overdue notified:', error));
+}
+
+setInterval(() => {
+    notifiedTasks.clear();
+}, 24 * 60 * 60 * 1000); 
 </script>
 
 </body>

@@ -135,7 +135,6 @@
                 <th class="px-6 py-3">Sales</th>
                 <th class="px-6 py-3">Keterangan</th>
                 <th class="px-6 py-3">Status</th>
-                <th class="px-6 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -158,15 +157,6 @@
                         'bg-green-100 text-green-800') }}">
                       {{ ucfirst($recap->status) }}
                     </span>
-                  </td>
-                  <td class="px-6 py-4 flex space-x-2">
-                    <a href="{{ route('recaps.edit', $recap->id) }}"
-                       class="text-yellow-600 hover:text-yellow-800 font-medium text-sm">Edit</a>
-                    <form action="{{ route('recaps.destroy', $recap->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus recap ini?')">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm">Hapus</button>
-                    </form>
                   </td>
                 </tr>
               @endforeach

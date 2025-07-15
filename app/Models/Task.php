@@ -145,4 +145,53 @@ class Task extends Model
         
         return $this->completed_at->setTimezone('Asia/Jakarta')->diffForHumans();
     }
+
+    // Tambahkan method ini di Task.php Model
+
+public function isOverdue()
+{
+    return $this->status === 'pending' && 
+           $this->datetime->lt(Carbon::now('Asia/Jakarta'));
+}
+
+public function getOverdueDurationAttribute()
+{
+    if (!$this->isOverdue()) {
+        return null;
+    }
+    
+    $now = Carbon::now('Asia/Jakarta');
+    $diff = $this->datetime->diff($now);
+    
+    if ($diff->days > 0) {
+        return $diff->days . ' hari ' . $diff->h . ' jam yang lalu';
+    } elseif ($diff->h > 0) {
+        return $diff->h . ' jam ' . $diff->i . ' menit yang lalu';
+    } else {
+        return $diff->i . ' menit yang lalu';
+    }
+}
+
+public function scopeOverdue($query)
+{
+    return $query->where('status', 'pending')
+                 ->where('datetime', '<', Carbon::now('Asia/Jakarta'));
+}
+
+public function getOverdueStatusAttribute()
+{
+    if (!$this->isOverdue()) {
+        return 'on_time';
+    }
+    
+    $hoursOverdue = $this->datetime->diffInHours(Carbon::now('Asia/Jakarta'));
+    
+    if ($hoursOverdue <= 2) {
+        return 'recently_overdue';
+    } elseif ($hoursOverdue <= 24) {
+        return 'overdue';
+    } else {
+        return 'critically_overdue';
+    }
+}
 }
