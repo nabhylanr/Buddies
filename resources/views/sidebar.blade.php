@@ -17,20 +17,6 @@
       background-color: #000000; /* Klik jadi hitam */
       color: white !important;
     }
-    .sidebar-item::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background-color: #000000;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    .sidebar-item.current::before {
-      opacity: 1;
-    }
     .sidebar-item.current {
       background-color: #000000;
       color: white !important;
@@ -126,14 +112,8 @@
 </div>
 
 <script>
-  const sidebarItems = document.querySelectorAll('.sidebar-item');
-
-  sidebarItems.forEach(item => {
-    item.addEventListener('click', function(e) {
-      sidebarItems.forEach(i => i.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
+  // Removed click handler to prevent double active states during page loading
+  // Active state is now handled only by server-side 'current' class
 </script>
 </body>
 </html>
