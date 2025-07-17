@@ -128,34 +128,41 @@ class TaskController extends Controller
     }
 
     public function history(Request $request)
-    {
-        $query = Task::with('recap')->where('status', 'completed');
+{
+    $query = Task::with('recap')->where('status', 'completed');
 
-        if ($request->filled('date')) {
-            $query->whereDate('datetime', $request->date);
-        }
-
-        if ($request->filled('time')) {
-            $query->whereTime('datetime', $request->time);
-        }
-
-        if ($request->filled('place')) {
-            $query->where('place', $request->place);
-        }
-
-        if ($request->filled('implementor')) {
-            $query->where('implementor', $request->implementor);
-        }
-
-        if ($request->filled('company')) {
-            $query->whereHas('recap', function($q) use ($request) {
-                $q->where('nama_perusahaan', 'like', '%' . $request->company . '%');
-            });
-        }
-
-        $tasks = $query->orderBy('completed_at', 'desc')->get();
-        return view('task.history', compact('tasks'));
+    // Filter berdasarkan tanggal jadwal (datetime)
+    if ($request->filled('date')) {
+        $query->whereDate('datetime', $request->date);
     }
+
+    // Filter berdasarkan tanggal penyelesaian (completed_at)
+    if ($request->filled('completed_date')) {
+        $query->whereDate('completed_at', $request->completed_date);
+    }
+
+    if ($request->filled('time')) {
+        $query->whereTime('datetime', $request->time);
+    }
+
+    if ($request->filled('place')) {
+        $query->where('place', $request->place);
+    }
+
+    if ($request->filled('implementor')) {
+        $query->where('implementor', $request->implementor);
+    }
+
+    if ($request->filled('company')) {
+        $query->whereHas('recap', function($q) use ($request) {
+            $q->where('nama_perusahaan', 'like', '%' . $request->company . '%');
+        });
+    }
+
+    // Urutkan berdasarkan waktu penyelesaian (completed_at) terbaru
+    $tasks = $query->orderBy('completed_at', 'desc')->get();
+    return view('task.history', compact('tasks'));
+}
 
     public function show(Task $task)
     {

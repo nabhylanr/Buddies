@@ -192,14 +192,20 @@
                     @endif
                   </td>
                   <td class="px-6 py-4 text-sm text-gray-600">
-                    {{-- Menggunakan accessor dari model yang sudah menghandle timezone --}}
+                    {{-- FIXED: Langsung gunakan Carbon parse dengan timezone Jakarta --}}
                     <div class="flex flex-col">
-                      <span class="font-medium">{{ $task->formatted_completed_at }}</span>
-                      @if($task->completed_at_relative)
-                        <span class="text-xs text-gray-400">
-                          ({{ $task->completed_at_relative }})
-                        </span>
-                      @endif
+                      <span class="font-medium">
+                        @if($task->completed_at)
+                          {{ \Carbon\Carbon::parse($task->completed_at)->setTimezone('Asia/Jakarta')->format('d M Y H:i') }}
+                        @else
+                          -
+                        @endif
+                      </span>
+                      <span class="text-xs text-gray-400">
+                        @if($task->completed_at)
+                          ({{ \Carbon\Carbon::parse($task->completed_at)->setTimezone('Asia/Jakarta')->diffForHumans() }})
+                        @endif
+                      </span>
                     </div>
                   </td>
                   <td class="px-6 py-4 flex space-x-2">

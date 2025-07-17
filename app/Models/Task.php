@@ -86,6 +86,7 @@ class Task extends Model
             return '-';
         }
         
+        // Fix: Ensure we're using the correct timezone when displaying
         return $this->completed_at->setTimezone('Asia/Jakarta')->format('d M Y H:i');
     }
 
@@ -101,11 +102,8 @@ class Task extends Model
     public function setCompletedAtAttribute($value)
     {
         if ($value) {
-            if ($value instanceof Carbon) {
-                $this->attributes['completed_at'] = $value->setTimezone('Asia/Jakarta')->utc();
-            } else {
-                $this->attributes['completed_at'] = Carbon::parse($value, 'Asia/Jakarta')->utc();
-            }
+            // Store as is - Laravel will handle UTC conversion automatically
+            $this->attributes['completed_at'] = $value;
         } else {
             $this->attributes['completed_at'] = null;
         }
@@ -115,7 +113,7 @@ class Task extends Model
     {
         $this->update([
             'status' => 'completed',
-            'completed_at' => Carbon::now('Asia/Jakarta') 
+            'completed_at' => Carbon::now() // Use system time, will be stored as UTC
         ]);
     }
 
