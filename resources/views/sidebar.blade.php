@@ -26,11 +26,12 @@
 <body class="bg-gray-50">
 <div class="h-full bg-white shadow-lg w-64 flex flex-col">
   <!-- Header -->
-  <div class="px-6 py-6 border-b border-gray-100">
-    <div class="flex items-center space-x-3">
-      <div class="text-2xl font-bold text-gray-800 text-center">Kopra Buddies</div>
+    <div class="px-6 py-6 border-b border-gray-100">
+    <div class="flex justify-center items-center">
+        <img src="{{ asset('images/buddies.png') }}" alt="Kopra Buddies" class="h-16 object-contain">
     </div>
-  </div>
+    </div>
+
 
   <!-- Navigation -->
   <nav class="flex-1 px-3 py-4 space-y-1">
