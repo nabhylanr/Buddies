@@ -64,112 +64,78 @@ Route::middleware('auth')->group(function () {
         return $controller->dashboard();
     })->name('dashboard');
 
-    Route::get('/settings', function () {
-        return view('settings');
-    });
-
     Route::get('/tasks', function (Request $request) {
         $user = Auth::user();
-        if (!$user->canAccessTasks()) {
+        if (!$user->isAdmin() && !$user->isImplementor()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
         }
         return app(TaskController::class)->index($request);
     })->name('tasks.index');
 
     Route::get('/tasks/create', function () {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
-        }
         $controller = app(TaskController::class);
         return $controller->create();
     })->name('tasks.create');
 
     Route::get('/tasks/history', function () {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
-        }
         $controller = app(TaskController::class);
         return $controller->history(request());
     })->name('tasks.history');
 
     Route::post('/tasks', function () {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
-        }
         $controller = app(TaskController::class);
         return $controller->store(request());
     })->name('tasks.store');
 
     Route::patch('/tasks/{task}/complete', function (Task $task) {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
-        }
         $controller = app(TaskController::class);
         return $controller->complete($task);
     })->name('tasks.complete');
 
     Route::patch('/tasks/{task}/uncomplete', function (Task $task) {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
-        }
         $controller = app(TaskController::class);
         return $controller->uncomplete($task);
     })->name('tasks.uncomplete');
 
     Route::get('/api/tasks/available-time-slots', function () {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
         $controller = app(TaskController::class);
         return $controller->getAvailableTimeSlots();
     });
 
     Route::get('/tasks/{task}', function (Task $task) {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
-        }
         $controller = app(TaskController::class);
         return $controller->show($task);
     })->name('tasks.show');
 
     Route::get('/tasks/{task}/edit', function (Task $task) {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
-        }
         $controller = app(TaskController::class);
-        return $controller->edit($task); 
+        return $controller->edit($task);
     })->name('tasks.edit');
 
     Route::put('/tasks/{task}', function (Task $task) {
-        $user = Auth::user();
-        if (!$user->canAccessTasks()) {
-            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
-        }
         $controller = app(TaskController::class);
         return $controller->update(request(), $task);
     })->name('tasks.update');
 
     Route::delete('/tasks/{task}', function (Task $task) {
+        $controller = app(TaskController::class);
+        return $controller->destroy($task);
+    })->name('tasks.destroy');
+
+    // User-specific task routes (for User role)
+    Route::get('/user/tasks', function (Request $request) {
         $user = Auth::user();
-        if (!$user->canAccessTasks()) {
+        if (!$user->isUser()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
         }
         $controller = app(TaskController::class);
-        return $controller->destroy($task); 
-    })->name('tasks.destroy');
+        return $controller->userTasks($request); 
+    })->name('user.tasks');
 
     Route::get('/user/create', function () {
         $user = Auth::user();
         if (!$user->isUser()) {
-            return redirect('/dashboard')->with('error', 'You do not have permission to access this page.');
+            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
         }
         $controller = app(TaskController::class);
         return $controller->create();
@@ -178,7 +144,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/create', function () {
         $user = Auth::user();
         if (!$user->isUser()) {
-            return redirect('/dashboard')->with('error', 'You do not have permission to access this page.');
+            return redirect('/calendar')->with('error', 'You do not have permission to access this page.');
         }
         $controller = app(TaskController::class);
         return $controller->store(request());
@@ -193,7 +159,7 @@ Route::middleware('auth')->group(function () {
         return $controller->getAvailableTimeSlots();
     });
 
-    Route::get('/user/recaps', function (Request $request) {
+    Route::get('/recaps/user', function (Request $request) {
         $user = Auth::user();
         if (!$user->isUser()) {
             return redirect('/calendar')->with('error', 'You do not have permission to access this page.');

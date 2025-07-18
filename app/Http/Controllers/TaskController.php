@@ -325,4 +325,34 @@ class TaskController extends Controller
         
         return response()->json(['success' => true]);
     }
+
+    public function userTasks(Request $request)
+    {
+        $query = Task::with('recap')->where('status', 'pending');
+
+        if ($request->filled('date')) {
+            $query->whereDate('datetime', $request->date);
+        }
+
+        if ($request->filled('time')) {
+            $query->whereTime('datetime', $request->time);
+        }
+
+        if ($request->filled('place')) {
+            $query->where('place', $request->place);
+        }
+
+        if ($request->filled('implementor')) {
+            $query->where('implementor', $request->implementor);
+        }
+
+        if ($request->filled('company')) {
+            $query->whereHas('recap', function($q) use ($request) {
+                $q->where('nama_perusahaan', 'like', '%' . $request->company . '%');
+            });
+        }
+
+        $tasks = $query->orderBy('datetime', 'asc')->get();
+        return view('task.user', compact('tasks'));
+    }
 }

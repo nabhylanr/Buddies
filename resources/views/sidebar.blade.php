@@ -58,10 +58,10 @@
     <a href="/calendar" class="sidebar-item {{ request()->is('calendar') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
       Calendar
     </a>
-    <a href="/user/recaps" class="sidebar-item {{ request()->is('user/recaps') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
+    <a href="/recaps/user" class="sidebar-item {{ request()->is('recaps/user') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
       Recap
     </a>
-    <a href="/user/create" class="sidebar-item {{ request()->is('user/create') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
+    <a href="/user/tasks" class="sidebar-item {{ request()->is('user/tasks') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
       Meetings
     </a>
     <a href="/profile" class="sidebar-item {{ request()->is('profile') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
