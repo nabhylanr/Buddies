@@ -7,14 +7,18 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; }
     
-    .profile-card {
+    /* Scope all profile styles to main content area only */
+    main {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    main .profile-card {
       background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
       transition: all 0.6s ease;
     }
     
-    .info-box {
+    main .info-box {
       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
       border: 1px solid #e2e8f0;
       transition: all 0.3s ease;
@@ -22,7 +26,7 @@
       overflow: hidden;
     }
     
-    .info-box::before {
+    main .info-box::before {
       content: '';
       position: absolute;
       top: 0;
@@ -34,40 +38,17 @@
       transition: opacity 0.3s ease;
     }
     
-    .info-box:hover::before {
+    main .info-box:hover::before {
       opacity: 1;
     }
     
-    .info-box:hover {
+    main .info-box:hover {
       transform: translateX(2px);
       border-color: #cbd5e1;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
     }
     
-    .avatar-container {
-      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(255, 255, 255, 0.8);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .avatar-container::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transform: rotate(-45deg);
-      transition: transform 0.6s ease;
-    }
-    
-    .avatar-container:hover::before {
-      transform: rotate(-45deg) translate(50%, 50%);
-    }
-    
-    .floating-header {
+    main .floating-header {
       animation: float 6s ease-in-out infinite;
     }
     
@@ -76,12 +57,12 @@
       50% { transform: translateY(-3px); }
     }
     
-    .label-enhanced {
+    main .label-enhanced {
       position: relative;
       display: inline-block;
     }
     
-    .label-enhanced::after {
+    main .label-enhanced::after {
       content: '';
       position: absolute;
       bottom: -2px;
@@ -92,11 +73,11 @@
       transition: width 0.3s ease;
     }
     
-    .info-box:hover .label-enhanced::after {
+    main .info-box:hover .label-enhanced::after {
       width: 100%;
     }
     
-    .text-shimmer {
+    main .text-shimmer {
       background: linear-gradient(45deg, #374151, #6b7280, #374151);
       background-size: 200% 200%;
       -webkit-background-clip: text;
@@ -107,6 +88,11 @@
     @keyframes shimmer {
       0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
+    }
+
+    /* Ensure sidebar is not affected by profile styles */
+    aside {
+      font-family: 'Inter', sans-serif;
     }
   </style>
 </head>
@@ -139,8 +125,8 @@
       <!-- Avatar + Info -->
       <div class="flex items-center space-x-4 mb-6">
         <div class="relative">
-          <div class="avatar-container relative inline-flex items-center justify-center w-14 h-14 overflow-hidden rounded-full">
-            <span class="font-medium text-gray-600 text-lg relative z-10">
+          <div class="w-14 h-14 rounded-full flex items-center justify-center bg-gray-200">
+            <span class="font-medium text-gray-600 text-lg">
               {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </span>
           </div>
