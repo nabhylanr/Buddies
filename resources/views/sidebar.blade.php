@@ -49,9 +49,6 @@
     <a href="/tasks" class="sidebar-item {{ request()->is('tasks') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
       Tasks
     </a>
-    <a href="/user/create" class="sidebar-item {{ request()->is('user/create') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
-      Meetings
-    </a>
     <a href="/profile" class="sidebar-item {{ request()->is('profile') ? 'current' : '' }} flex items-center px-3 py-2.5 rounded-lg text-sm font-medium">
       Profile
     </a>
