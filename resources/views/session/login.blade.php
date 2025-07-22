@@ -27,7 +27,7 @@
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, #093e78 0%, rgba(9, 62, 120, 0.8) 100%);
+      background: black;
       border: 1px solid rgba(237, 238, 240, 0.3);
       backdrop-filter: blur(10px);
       transition: all 0.4s ease;
@@ -87,21 +87,10 @@
       background-attachment: fixed;
     }
     
-    /* Overlay gradient */
-    .overlay {
-      background: linear-gradient(135deg, rgba(9, 62, 120, 0.3) 0%, rgba(9, 62, 120, 0.1) 100%);
-    }
   </style>
 </head>
-<body class="custom-bg min-h-screen flex items-center justify-center p-4">
-  
-  <!-- Overlay -->
-  <div class="overlay fixed inset-0"></div>
-  
-  <!-- Main Container -->
-  <div class="relative z-10 w-full max-w-md fade-in">
-    
-    <!-- Logo/Header Section -->
+<body class="custom-bg min-h-screen flex items-center justify-center p-4">  
+  <div class="relative z-10 w-full max-w-md fade-in">    
     <div class="text-center mb-8 floating-animation">
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-full glass-card mb-4">
         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,15 +100,12 @@
       <h1 class="text-3xl font-bold text-white mb-2">Hi, Buddies!</h1>
     </div>
 
-    <!-- Login Form Card -->
     <div class="glass-card rounded-3xl p-8">
       <form class="space-y-6" action="{{ route('login') }}" method="POST">
         @csrf
-        
-        <!-- Email Field -->
         <div class="space-y-2">
           <label for="email" class="block text-sm font-medium text-white tracking-wide">
-            EMAIL ADDRESS
+            Email
           </label>
           <div class="relative">
             <input 
@@ -132,21 +118,14 @@
               required
               class="input-glass block w-full rounded-xl px-4 py-3 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-0 text-sm"
             />
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
-              </svg>
-            </div>
-          </div>
           @error('email')
             <p class="text-red-300 text-xs mt-1">{{ $message }}</p>
           @enderror
         </div>
 
-        <!-- Password Field -->
         <div class="space-y-2">
           <label for="password" class="block text-sm font-medium text-white tracking-wide">
-            PASSWORD
+            Password
           </label>
           <div class="relative">
             <input 
@@ -158,36 +137,17 @@
               required
               class="input-glass block w-full rounded-xl px-4 py-3 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-0 text-sm pr-10"
             />
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-              </svg>
-            </div>
           </div>
           @error('password')
             <p class="text-red-300 text-xs mt-1">{{ $message }}</p>
           @enderror
         </div>
-
-        <!-- Remember Me & Forgot Password -->
-        <div class="flex items-center justify-between text-sm">
-          <label class="flex items-center text-gray-200">
-            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
-            <span>Remember me</span>
-          </label>
-        </div>
-
-        <!-- Sign In Button -->
         <button 
           type="submit"
-          class="btn-primary w-full py-3 px-4 rounded-xl text-white font-semibold text-sm tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-transparent"
-        >
-          SIGN IN
+          class="btn-primary w-full py-3 px-4 rounded-xl text-white font-semibold text-sm tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-transparent">Sign in
         </button>
       </form>
 
-      <!-- Sign Up Link -->
       <div class="text-center mt-8">
         <p class="text-gray-200 text-sm">
           Don't have an account?
@@ -197,17 +157,5 @@
         </p>
       </div>
     </div>
-
-    <!-- Footer -->
-    <div class="text-center mt-8">
-      <p class="text-xs text-gray-300 opacity-75">
-        By signing in, you agree to our 
-        <a href="#" class="underline hover:no-underline">Terms of Service</a> 
-        and 
-        <a href="#" class="underline hover:no-underline">Privacy Policy</a>
-      </p>
-    </div>
-  </div>
-
 </body>
 </html>

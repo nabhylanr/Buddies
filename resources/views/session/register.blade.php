@@ -27,7 +27,7 @@
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, #093e78 0%, rgba(9, 62, 120, 0.8) 100%);
+      background: black;
       border: 1px solid rgba(237, 238, 240, 0.3);
       backdrop-filter: blur(10px);
       transition: all 0.4s ease;
@@ -86,22 +86,10 @@
       background-position: center;
       background-attachment: fixed;
     }
-    
-    /* Overlay gradient */
-    .overlay {
-      background: linear-gradient(135deg, rgba(9, 62, 120, 0.3) 0%, rgba(9, 62, 120, 0.1) 100%);
-    }
   </style>
 </head>
-<body class="custom-bg min-h-screen flex items-center justify-center p-4">
-  
-  <!-- Overlay -->
-  <div class="overlay fixed inset-0"></div>
-  
-  <!-- Main Container -->
-  <div class="relative z-10 w-full max-w-md fade-in">
-    
-    <!-- Logo/Header Section -->
+<body class="custom-bg min-h-screen flex items-center justify-center p-4">  
+  <div class="relative z-10 w-full max-w-md fade-in">    
     <div class="text-center mb-8 floating-animation">
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-full glass-card mb-4">
         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,16 +98,12 @@
       </div>
       <h1 class="text-3xl font-bold text-white mb-2">Create Account</h1>
     </div>
-
-    <!-- Register Form Card -->
     <div class="glass-card rounded-3xl p-8">
       <form class="space-y-6" action="{{ route('register') }}" method="POST">
-        @csrf
-        
-        <!-- Name Field -->
+        @csrf        
         <div class="space-y-2">
           <label for="name" class="block text-sm font-medium text-white tracking-wide">
-            FULL NAME
+            Name
           </label>
           <div class="relative">
             <input 
@@ -127,25 +111,19 @@
               name="name" 
               id="name" 
               value="{{ old('name') }}" 
-              placeholder="Enter your full name"
+              placeholder="Enter your name"
               required
               class="input-glass block w-full rounded-xl px-4 py-3 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-0 text-sm"
             />
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-              </svg>
-            </div>
           </div>
           @error('name')
             <p class="text-red-300 text-xs mt-1">{{ $message }}</p>
           @enderror
         </div>
 
-        <!-- Email Field -->
         <div class="space-y-2">
           <label for="email" class="block text-sm font-medium text-white tracking-wide">
-            EMAIL ADDRESS
+            Email
           </label>
           <div class="relative">
             <input 
@@ -158,21 +136,15 @@
               required
               class="input-glass block w-full rounded-xl px-4 py-3 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-0 text-sm"
             />
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
-              </svg>
-            </div>
           </div>
           @error('email')
             <p class="text-red-300 text-xs mt-1">{{ $message }}</p>
           @enderror
         </div>
 
-        <!-- Password Field -->
         <div class="space-y-2">
           <label for="password" class="block text-sm font-medium text-white tracking-wide">
-            PASSWORD
+            Password
           </label>
           <div class="relative">
             <input 
@@ -184,21 +156,15 @@
               required
               class="input-glass block w-full rounded-xl px-4 py-3 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-0 text-sm pr-10"
             />
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-              </svg>
-            </div>
           </div>
           @error('password')
             <p class="text-red-300 text-xs mt-1">{{ $message }}</p>
           @enderror
         </div>
 
-        <!-- Confirm Password Field -->
         <div class="space-y-2">
           <label for="password_confirmation" class="block text-sm font-medium text-white tracking-wide">
-            CONFIRM PASSWORD
+            Confirm Password
           </label>
           <div class="relative">
             <input 
@@ -210,27 +176,15 @@
               required
               class="input-glass block w-full rounded-xl px-4 py-3 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-0 text-sm pr-10"
             />
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
           </div>
         </div>
-
-        <!-- Terms & Privacy -->
-        
-
-        <!-- Register Button -->
         <button 
           type="submit"
           class="btn-primary w-full py-3 px-4 rounded-xl text-white font-semibold text-sm tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-transparent"
         >
-          CREATE ACCOUNT
+          Create account
         </button>
       </form>
-
-      <!-- Sign In Link -->
       <div class="text-center mt-8">
         <p class="text-gray-200 text-sm">
           Already have an account?
@@ -240,17 +194,5 @@
         </p>
       </div>
     </div>
-
-    <!-- Footer -->
-    <div class="text-center mt-8">
-      <p class="text-xs text-gray-300 opacity-75">
-        By creating an account, you agree to our 
-        <a href="#" class="underline hover:no-underline">Terms of Service</a> 
-        and 
-        <a href="#" class="underline hover:no-underline">Privacy Policy</a>
-      </p>
-    </div>
-  </div>
-
 </body>
 </html>

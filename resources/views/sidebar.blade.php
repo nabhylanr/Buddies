@@ -4,10 +4,103 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>Dark Blue Sidebar</title>
+  <title>Starry Night Sidebar</title>
   <style>
     .sidebar-gradient {
-      background: linear-gradient(135deg, #041e42 0%, #052854 50%, #073161 100%);
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Bintang-bintang kecil */
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+    
+    .star:nth-child(odd) {
+      animation-delay: -1s;
+    }
+    
+    .star:nth-child(3n) {
+      animation-delay: -2s;
+    }
+    
+    .star:nth-child(4n) {
+      animation-delay: -0.5s;
+    }
+    
+    .star:nth-child(5n) {
+      animation-delay: -1.5s;
+    }
+    
+    /* Ukuran bintang berbeda */
+    .star-small {
+      width: 1px;
+      height: 1px;
+      box-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+    }
+    
+    .star-medium {
+      width: 2px;
+      height: 2px;
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.9);
+    }
+    
+    .star-large {
+      width: 3px;
+      height: 3px;
+      box-shadow: 0 0 7px rgba(255, 255, 255, 1);
+    }
+    
+    /* Animasi berkedip */
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      25% { opacity: 0.8; transform: scale(1.2); }
+      50% { opacity: 1; transform: scale(1.5); }
+      75% { opacity: 0.6; transform: scale(1.1); }
+    }
+    
+    /* Shooting star effect */
+    .shooting-star {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+      animation: shoot 8s linear infinite;
+      opacity: 0;
+    }
+    
+    @keyframes shoot {
+      0% {
+        opacity: 0;
+        transform: translateX(-100px) translateY(50px);
+      }
+      5% {
+        opacity: 1;
+      }
+      15% {
+        opacity: 1;
+      }
+      20% {
+        opacity: 0;
+        transform: translateX(300px) translateY(-50px);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(300px) translateY(-50px);
+      }
     }
     
     .sidebar-item {
@@ -17,6 +110,7 @@
       border-radius: 12px;
       margin-bottom: 4px;
       overflow: hidden;
+      z-index: 10;
     }
     
     .sidebar-item::before {
@@ -43,7 +137,7 @@
     
     .sidebar-item.current {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
-      color: #041e42 !important;
+      color: #000000 !important;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
       font-weight: 600;
     }
@@ -61,6 +155,8 @@
       backdrop-filter: blur(10px);
       border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 10;
     }
     
     .user-section {
@@ -68,6 +164,8 @@
       backdrop-filter: blur(10px);
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 10;
     }
     
     .avatar-container {
@@ -86,10 +184,47 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
     }
+
+    /* Navigation z-index */
+    nav {
+      position: relative;
+      z-index: 10;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
-<div class="h-full w-64 flex flex-col sidebar-gradient shadow-2xl">
+<div class="h-screen w-64 flex flex-col sidebar-gradient shadow-2xl">
+  <div class="stars">
+    <div class="star star-small" style="top: 15%; left: 12%;"></div>
+    <div class="star star-small" style="top: 25%; left: 85%;"></div>
+    <div class="star star-small" style="top: 35%; left: 20%;"></div>
+    <div class="star star-small" style="top: 45%; left: 75%;"></div>
+    <div class="star star-small" style="top: 55%; left: 15%;"></div>
+    <div class="star star-small" style="top: 65%; left: 80%;"></div>
+    <div class="star star-small" style="top: 75%; left: 25%;"></div>
+    <div class="star star-small" style="top: 85%; left: 70%;"></div>
+    <div class="star star-small" style="top: 18%; left: 45%;"></div>
+    <div class="star star-small" style="top: 38%; left: 60%;"></div>
+    <div class="star star-small" style="top: 58%; left: 35%;"></div>
+    <div class="star star-small" style="top: 78%; left: 55%;"></div>
+    
+    <div class="star star-medium" style="top: 22%; left: 70%;"></div>
+    <div class="star star-medium" style="top: 42%; left: 30%;"></div>
+    <div class="star star-medium" style="top: 62%; left: 65%;"></div>
+    <div class="star star-medium" style="top: 82%; left: 40%;"></div>
+    <div class="star star-medium" style="top: 28%; left: 50%;"></div>
+    <div class="star star-medium" style="top: 68%; left: 15%;"></div>
+    
+    <div class="star star-large" style="top: 32%; left: 85%;"></div>
+    <div class="star star-large" style="top: 52%; left: 25%;"></div>
+    <div class="star star-large" style="top: 72%; left: 75%;"></div>
+    <div class="star star-large" style="top: 12%; left: 60%;"></div>
+    
+    <div class="shooting-star" style="top: 20%; width: 80px; animation-delay: 2s;"></div>
+    <div class="shooting-star" style="top: 60%; width: 100px; animation-delay: 5s;"></div>
+    <div class="shooting-star" style="top: 40%; width: 60px; animation-delay: 7s;"></div>
+  </div>
+
   <!-- Header -->
   <div class="px-6 py-6 flex justify-center items-center">
     <img src="{{ asset('images/koprawhite.png') }}" alt="Kopra Buddies" class="h-20 object-contain scale-150">
@@ -215,5 +350,56 @@
   </div>
   @endauth
 </div>
+
+<script>
+function createStars() {
+  const starsContainer = document.querySelector('.stars');
+  const starCount = 30;
+  
+  for (let i = 0; i < starCount; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    
+    const sizes = ['star-small', 'star-medium', 'star-large'];
+    const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+    star.classList.add(randomSize);
+    
+    star.style.top = Math.random() * 100 + '%';
+    star.style.left = Math.random() * 100 + '%';
+    
+    star.style.animationDelay = Math.random() * 3 + 's';
+    
+    starsContainer.appendChild(star);
+  }
+}
+
+function setActivePage() {
+  const currentPath = window.location.pathname;
+  const sidebarItems = document.querySelectorAll('.sidebar-item');
+  
+  sidebarItems.forEach(item => {
+    item.classList.remove('current');
+  });
+  
+  sidebarItems.forEach(item => {
+    const href = item.getAttribute('href');
+    
+    if (currentPath === href || 
+        (href !== '/' && currentPath.startsWith(href)) ||
+        (href === '/dashboard' && currentPath === '/') ||
+        (href === '/recaps/user' && currentPath.includes('recaps/user')) ||
+        (href === '/user/tasks' && currentPath.includes('user/tasks'))) {
+      item.classList.add('current');
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  createStars();
+  setActivePage();
+});
+
+window.addEventListener('popstate', setActivePage);
+</script>
 </body>
 </html>
