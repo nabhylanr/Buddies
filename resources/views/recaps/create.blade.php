@@ -45,11 +45,14 @@
 
             <div class="mt-10 grid grid-cols-1 gap-y-8">
 
-              <!-- Company ID -->
+              <!-- Company ID - Now Optional -->
               <div class="col-span-full">
-                <label for="company_id" class="block text-sm font-medium text-gray-900">Company ID</label>
+                <label for="company_id" class="block text-sm font-medium text-gray-900">
+                  Company ID 
+                  <span class="text-red-500">*</span>
+                </label>
                 <div class="mt-2">
-                  <input type="text" name="company_id" id="company_id" value="{{ old('company_id') }}" required
+                  <input type="text" name="company_id" id="company_id" value="{{ old('company_id') }}"
                     class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" 
                     placeholder="Masukkan Company ID" />
                 </div>
@@ -57,7 +60,10 @@
 
               <!-- Nama Perusahaan -->
               <div class="col-span-full">
-                <label for="nama_perusahaan" class="block text-sm font-medium text-gray-900">Nama Perusahaan</label>
+                <label for="nama_perusahaan" class="block text-sm font-medium text-gray-900">
+                  Nama Perusahaan 
+                  <span class="text-red-500">*</span>
+                </label>
                 <div class="mt-2">
                   <input type="text" name="nama_perusahaan" id="nama_perusahaan" value="{{ old('nama_perusahaan') }}" required
                     class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" 
@@ -65,11 +71,14 @@
                 </div>
               </div>
 
-              <!-- Cabang -->
+              <!-- Cabang - Now Optional -->
               <div class="col-span-full">
-                <label for="cabang" class="block text-sm font-medium text-gray-900">Cabang</label>
+                <label for="cabang" class="block text-sm font-medium text-gray-900">
+                  Cabang 
+                  <span class="text-red-500">*</span>
+                </label>
                 <div class="mt-2">
-                  <input type="text" name="cabang" id="cabang" value="{{ old('cabang') }}" required
+                  <input type="text" name="cabang" id="cabang" value="{{ old('cabang') }}"
                     class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" 
                     placeholder="Masukkan nama cabang" />
                 </div>
@@ -77,7 +86,10 @@
 
               <!-- Sales -->
               <div class="col-span-full">
-                <label for="sales" class="block text-sm font-medium text-gray-900">Sales</label>
+                <label for="sales" class="block text-sm font-medium text-gray-900">
+                  Sales 
+                  <span class="text-red-500">*</span>
+                </label>
                 <div class="mt-2">
                   <input type="text" name="sales" id="sales" value="{{ old('sales') }}" required
                     class="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none" 

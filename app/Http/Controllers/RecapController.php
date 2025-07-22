@@ -46,9 +46,9 @@ class RecapController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'company_id' => 'required|string|max:255',
+            'company_id' => 'nullable|string|max:255',
             'nama_perusahaan' => 'required|string|max:255',
-            'cabang' => 'required|string|max:255',
+            'cabang' => 'nullable|string|max:255',
             'sales' => 'required|string|max:255',
             'keterangan' => 'nullable|string'
         ]);
@@ -79,9 +79,9 @@ class RecapController extends Controller
     public function update(Request $request, Recap $recap)
     {
         $request->validate([
-            'company_id' => 'required|string|max:255',
+            'company_id' => 'nullable|string|max:255',
             'nama_perusahaan' => 'required|string|max:255',
-            'cabang' => 'required|string|max:255',
+            'cabang' => 'nullable|string|max:255',
             'sales' => 'required|string|max:255',
             'keterangan' => 'nullable|string'
         ]);

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Task</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Recap Card Transition */
     .recap-card {
@@ -211,6 +212,56 @@
       background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
       transition: all 0.4s ease;
     }
+
+    /* Chart Container */
+    .chart-container {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.8s ease;
+    }
+    .chart-container:hover::before {
+      left: 100%;
+    }
+    .chart-container:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Chart Animation */
+    @keyframes chartFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    .chart-animate {
+      animation: chartFadeIn 1s ease-out;
+    }
+
+    /* Statistics Container */
+    .stats-container {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      transition: all 0.4s ease;
+    }
+    .stats-container:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body class="bg-gray-50 h-screen">
@@ -222,88 +273,147 @@
 
   <!-- Main Content -->
   <main class="flex-1 overflow-y-auto p-6">
-    <div class="main-container bg-white p-8 rounded-xl shadow-xl border border-gray-100">
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            Hi, Buddies!
-          </h2>
+    <div class="main-container bg-white p-8 rounded-xl shadow-xl border border-gray-100 flex items-center justify-between">
+        <div class="flex-1">
+            <h2 class="text-2xl font-bold text-gray-800">Hello, {{ Auth::user()->name }}!</h2>
+            <p class="text-sm text-gray-600 mt-2">
+                Kopra Buddies helps you stay organized and in control by assisting with scheduling client implementations, managing timelines, and coordinating every step of your tasks. Whether it's planning, tracking, or collaborating, we make everything seamless and stress-free. So let's start!
+            </p>
+            <div class="mt-4 flex gap-3">
+                <a href="{{ route('tasks.index') }}"
+                    class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-white text-[#093e78] text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#093e78] focus:ring-offset-2">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    Lihat Semua Task
+                </a>
+                <a href="{{ route('tasks.create') }}"
+                    class="inline-flex items-center justify-center px-4 py-2 rounded-md text-white text-sm font-semibold shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#093e78] focus:ring-offset-2"
+                    style="background-color: #093e78;">
+                    <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Tambah Task
+                </a>
+            </div>
         </div>
-        <div class="flex space-x-3">
-          <a href="{{ route('tasks.index') }}"
-              class="btn-primary inline-flex items-center justify-center px-4 py-2 rounded-md bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-              </svg>
-              Lihat Semua Task
-          </a>
-          <a href="{{ route('tasks.create') }}"
-              class="btn-primary inline-flex items-center justify-center px-4 py-2 rounded-md bg-gray-900 text-white text-sm font-semibold shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-              <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Tambah Task
-          </a>
+        <div class="ml-6 flex-shrink-0">
+            <img src="{{ asset('images/buddies.png') }}" alt="Illustration" class="w-32">
         </div>
-      </div>
+    </div>
 
-      <!-- Statistics Bar -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="stats-card bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-blue-100 text-sm">Total Task</p>
-              <p class="text-2xl font-bold">{{ $totalTasks }}</p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <div class="lg:col-span-1">
+            <div class="stats-container bg-white p-6 rounded-xl shadow-xl border border-gray-100 h-full">
+                <h3 class="text-xl font-semibold text-gray-800 mb-6">Task Statistics</h3>
+                <div class="space-y-4">
+                    <!-- Total Task -->
+                    <div class="stats-card bg-gradient-to-r from-[#093e78] to-[#0b4c94] rounded-xl p-4 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Total Task</p>
+                                <p class="text-2xl font-bold">{{ $totalTasks }}</p>
+                            </div>
+                            <div class="text-blue-200">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hari Ini -->
+                    <div class="stats-card bg-gradient-to-r from-[#093e78] to-[#145da0] rounded-xl p-4 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Hari Ini</p>
+                                <p class="text-2xl font-bold">{{ $todayTasks }}</p>
+                            </div>
+                            <div class="text-blue-200">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Minggu Ini -->
+                    <div class="stats-card bg-gradient-to-r from-[#093e78] to-[#1a65a8] rounded-xl p-4 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Minggu Ini</p>
+                                <p class="text-2xl font-bold">{{ $weekTasks }}</p>
+                            </div>
+                            <div class="text-blue-200">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Overdue -->
+                    <div class="stats-card bg-gradient-to-r from-red-600 to-red-700 rounded-xl p-4 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-red-100 text-sm">Overdue</p>
+                                <p class="text-2xl font-bold">{{ $overdueTasks }}</p>
+                            </div>
+                            <div class="text-red-200">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="text-blue-200">
-              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-          </div>
         </div>
-        <div class="stats-card bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-green-100 text-sm">Hari Ini</p>
-              <p class="text-2xl font-bold">{{ $todayTasks }}</p>
-            </div>
-            <div class="text-green-200">
-              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-        <div class="stats-card bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-yellow-100 text-sm">Minggu Ini</p>
-              <p class="text-2xl font-bold">{{ $weekTasks }}</p>
-            </div>
-            <div class="text-yellow-200">
-              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-        <div class="stats-card bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-red-100 text-sm">Overdue</p>
-              <p class="text-2xl font-bold">{{ $overdueTasks }}</p>
-            </div>
-            <div class="text-red-200">
-              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
 
+        <!-- Chart Section -->
+        <div class="lg:col-span-1">
+            <div class="chart-container bg-white p-6 rounded-xl shadow-xl border border-gray-100 h-full">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Task Distribution</h3>
+                <div class="chart-animate relative h-64 flex items-center justify-center">
+                    <canvas id="taskChart" width="250" height="250"></canvas>
+                </div>
+                <!-- Legend -->
+                <div class="mt-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Hari Ini</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-800">{{ $todayTasks }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Minggu Ini</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-800">{{ $weekTasks - $todayTasks }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Overdue</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-800">{{ $overdueTasks }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Mendatang</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-800">{{ $totalTasks - $weekTasks - $overdueTasks }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container bg-white p-8 rounded-xl shadow-xl border border-gray-100 mt-6">
       @if(session('success'))
         <div class="alert-slide mb-6 p-4 bg-green-100 border border-green-200 text-green-700 rounded-xl flex items-center">
           <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -325,7 +435,7 @@
                 Peringatan: Ada {{ $overdueTasks }} task yang overdue!
                 </h3>
                 <p class="text-red-600 text-xs">
-                Segera selesaikan atau jadwalkan kembali task yang sudah melewati deadline.
+                Segera selesaikan atau jadwalkan task yang sudah melewati deadline.
                 </p>
             </div>
             </div>
@@ -333,33 +443,46 @@
         @endif
 
       <!-- Filter Options -->
-      <div class="mb-6" x-data="{ currentFilter: 'all' }">
+    <div class="mb-6" x-data="{ currentFilter: 'all' }">
         <div class="filter-panel p-4 rounded-lg">
-          <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2">
+            <!-- Semua Task -->
             <button @click="currentFilter = 'all'; filterTasks('all')" 
-                    :class="currentFilter === 'all' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
-                    class="filter-btn px-4 py-2 rounded-lg text-sm font-medium">
-              Semua Task
+                    :class="currentFilter === 'all' 
+                            ? 'bg-[#093e78] text-white' 
+                            : 'bg-white text-[#093e78] text-sm font-semibold shadow-sm ring-1 ring-inset ring-[#093e78] hover:bg-[#f0f4f9]'"
+                    class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition">
+                Semua Task
             </button>
+            <!-- Hari Ini -->
             <button @click="currentFilter = 'today'; filterTasks('today')" 
-                    :class="currentFilter === 'today' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
-                    class="filter-btn px-4 py-2 rounded-lg text-sm font-medium">
-              Hari Ini
+                    :class="currentFilter === 'today' 
+                            ? 'bg-[#093e78] text-white' 
+                            : 'bg-white text-[#093e78] text-sm font-semibold shadow-sm ring-1 ring-inset ring-[#093e78] hover:bg-[#f0f4f9]'"
+                    class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition">
+                Hari Ini
             </button>
+            <!-- Minggu Ini -->
             <button @click="currentFilter = 'week'; filterTasks('week')" 
-                    :class="currentFilter === 'week' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50'"
-                    class="filter-btn px-4 py-2 rounded-lg text-sm font-medium">
-              Minggu Ini
+                    :class="currentFilter === 'week' 
+                            ? 'bg-[#093e78] text-white' 
+                            : 'bg-white text-[#093e78] text-sm font-semibold shadow-sm ring-1 ring-inset ring-[#093e78] hover:bg-[#f0f4f9]'"
+                    class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition">
+                Minggu Ini
             </button>
-            <button @click="currentFilter = 'overdue'; filterTasks('overdue')" 
-                    :class="currentFilter === 'overdue' ? 'bg-red-800 text-white' : 'bg-white text-red-600 text-sm font-semibold shadow-sm ring-1 ring-inset ring-red-300 hover:bg-red-50'"
-                    class="filter-btn px-4 py-2 rounded-lg text-sm font-medium">
-              Overdue
-            </button>
-          </div>
-        </div>
-      </div>
 
+            <!-- Overdue -->
+            <button @click="currentFilter = 'overdue'; filterTasks('overdue')" 
+                    :class="currentFilter === 'overdue' 
+                            ? 'bg-red-800 text-white' 
+                            : 'bg-white text-red-600 text-sm font-semibold shadow-sm ring-1 ring-inset ring-red-300 hover:bg-red-50'"
+                    class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition">
+                Overdue
+            </button>
+            </div>
+        </div>
+    </div>
+    
       <!-- Task List - Reminders Style -->
       <div id="taskContainer">
         @if($tasks->isEmpty())
@@ -462,6 +585,70 @@
     </div>
   </main>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('taskChart').getContext('2d');
+    
+    const todayTasks = {{ $todayTasks }};
+    const weekTasks = {{ $weekTasks }};
+    const overdueTasks = {{ $overdueTasks }};
+    const totalTasks = {{ $totalTasks }};
+    
+    const upcomingTasks = totalTasks - weekTasks - overdueTasks;
+    const weekOnlyTasks = weekTasks - todayTasks; 
+    
+    const chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Hari Ini', 'Minggu Ini', 'Overdue', 'Mendatang'],
+            datasets: [{
+                data: [todayTasks, weekOnlyTasks, overdueTasks, upcomingTasks],
+                backgroundColor: [
+                    '#2563eb', 
+                    '#3b82f6', 
+                    '#ef4444', 
+                    '#9ca3af'  
+                ],
+                borderWidth: 0,
+                cutout: '65%' 
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: false,
+                duration: 1000,
+                easing: 'easeOutQuart'
+            }
+        }
+    });    
+    ctx.canvas.style.cursor = 'pointer';
+});
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script>
