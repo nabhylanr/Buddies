@@ -262,6 +262,19 @@
       transform: translateY(-2px);
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
     }
+
+     .floating-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .bear-container {
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.1));
+        }
   </style>
 </head>
 <body class="bg-gray-50 h-screen">
@@ -272,36 +285,42 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 overflow-y-auto p-6">
-    <div class="main-container bg-white p-8 rounded-xl shadow-xl border border-gray-100 flex items-center justify-between">
-        <div class="flex-1">
-            <h2 class="text-2xl font-bold text-gray-800">Hello, {{ Auth::user()->name }}!</h2>
-            <p class="text-sm text-gray-600 mt-2">
-                Kopra Buddies helps you stay organized and in control by assisting with scheduling client implementations, managing timelines, and coordinating every step of your tasks. Whether it's planning, tracking, or collaborating, we make everything seamless and stress-free. So let's start!
-            </p>
-            <div class="mt-4 flex gap-3">
-                <a href="{{ route('tasks.index') }}"
-                    class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-white text-[#093e78] text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#093e78] focus:ring-offset-2">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    Lihat Semua Task
-                </a>
-                <a href="{{ route('tasks.create') }}"
-                    class="inline-flex items-center justify-center px-4 py-2 rounded-md text-white text-sm font-semibold shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#093e78] focus:ring-offset-2"
-                    style="background-color: #093e78;">
-                    <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Tambah Task
-                </a>
+      <main class="flex-1 overflow-y-auto p-6">
+        <div class="main-container bg-white p-8 rounded-xl shadow-xl border border-gray-100 flex items-center justify-between relative overflow-hidden">
+            <!-- Content Section - Width dikurangi untuk memberi space gambar -->
+            <div class="flex-1 max-w-2xl pr-6">
+                <h2 class="text-2xl font-bold text-gray-800">Hello, Admin User!</h2>
+                <p class="text-sm text-gray-600 mt-2">
+                    Kopra Buddies helps you stay organized and in control by assisting with scheduling client implementations, managing timelines, and coordinating every step of your tasks. Whether it's planning, tracking, or collaborating, we make everything seamless and stress-free. So let's start!
+                </p>
+                <div class="mt-4 flex gap-3">
+                    <button class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-white text-[#093e78] text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#093e78] focus:ring-offset-2 transition-all duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Lihat Semua Task
+                    </button>
+                    <button class="inline-flex items-center justify-center px-4 py-2 rounded-md text-white text-sm font-semibold shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#093e78] focus:ring-offset-2 transition-all duration-200"
+                        style="background-color: #093e78;">
+                        <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Tambah Task
+                    </button>
+                </div>
             </div>
+            
+            <!-- Image Section - Diperbesar dan diberi animasi floating -->
+            <div class="bear-container floating-animation flex-shrink-0 relative">
+                <img src="{{ asset('images/hello.png') }}" 
+                     class="w-48 h-48 object-contain transform scale-150 -translate-x-9">
+                <!-- Optional: Tambah bayangan di bawah gambar untuk efek floating -->
+                <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-4 bg-gray-200 rounded-full opacity-30 blur-sm floating-shadow"></div>
+            </div>
+            
         </div>
-        <div class="ml-6 flex-shrink-0">
-            <img src="{{ asset('images/buddies.png') }}" alt="Illustration" class="w-32">
-        </div>
-    </div>
+
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <div class="lg:col-span-1">
