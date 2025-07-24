@@ -12,21 +12,11 @@ class TaskController extends Controller
 {
     public function create()
     {
-    // Ubah query untuk mengurutkan berdasarkan id (urutan penambahan)
-    // atau created_at jika kolom tersebut ada
-    $recaps = Recap::whereIn('status', ['pending', 'scheduled'])
-                  ->orderBy('id', 'asc') // Mengurutkan berdasarkan ID (yang ditambahkan duluan)
-                  ->get();
-    
-    // Alternatif jika tabel recap memiliki kolom created_at:
-    // $recaps = Recap::whereIn('status', ['pending', 'scheduled'])
-    //               ->orderBy('created_at', 'asc')
-    //               ->get();
-    
-    // Jika ingin menampilkan semua recap termasuk yang completed, gunakan:
-    // $recaps = Recap::orderBy('id', 'asc')->get();
-    
-    return view('task.create', compact('recaps'));
+        $recaps = Recap::whereIn('status', ['pending', 'scheduled'])
+                    ->orderBy('id', 'asc') 
+                    ->get();
+        
+        return view('task.create', compact('recaps'));
     }
 
     public function store(Request $request)
@@ -128,41 +118,38 @@ class TaskController extends Controller
     }
 
     public function history(Request $request)
-{
-    $query = Task::with('recap')->where('status', 'completed');
+    {
+        $query = Task::with('recap')->where('status', 'completed');
 
-    // Filter berdasarkan tanggal jadwal (datetime)
-    if ($request->filled('date')) {
-        $query->whereDate('datetime', $request->date);
+        if ($request->filled('date')) {
+            $query->whereDate('datetime', $request->date);
+        }
+
+        if ($request->filled('completed_date')) {
+            $query->whereDate('completed_at', $request->completed_date);
+        }
+
+        if ($request->filled('time')) {
+            $query->whereTime('datetime', $request->time);
+        }
+
+        if ($request->filled('place')) {
+            $query->where('place', $request->place);
+        }
+
+        if ($request->filled('implementor')) {
+            $query->where('implementor', $request->implementor);
+        }
+
+        if ($request->filled('company')) {
+            $query->whereHas('recap', function($q) use ($request) {
+                $q->where('nama_perusahaan', 'like', '%' . $request->company . '%');
+            });
+        }
+
+        $tasks = $query->orderBy('completed_at', 'desc')->get();
+        return view('task.history', compact('tasks'));
     }
-
-    // Filter berdasarkan tanggal penyelesaian (completed_at)
-    if ($request->filled('completed_date')) {
-        $query->whereDate('completed_at', $request->completed_date);
-    }
-
-    if ($request->filled('time')) {
-        $query->whereTime('datetime', $request->time);
-    }
-
-    if ($request->filled('place')) {
-        $query->where('place', $request->place);
-    }
-
-    if ($request->filled('implementor')) {
-        $query->where('implementor', $request->implementor);
-    }
-
-    if ($request->filled('company')) {
-        $query->whereHas('recap', function($q) use ($request) {
-            $q->where('nama_perusahaan', 'like', '%' . $request->company . '%');
-        });
-    }
-
-    // Urutkan berdasarkan waktu penyelesaian (completed_at) terbaru
-    $tasks = $query->orderBy('completed_at', 'desc')->get();
-    return view('task.history', compact('tasks'));
-}
 
     public function show(Task $task)
     {
@@ -171,11 +158,11 @@ class TaskController extends Controller
     }
 
     public function edit(Task $task)
-{
-    $task->load('recap');
-    $recaps = Recap::orderBy('id', 'asc')->get();
-    return view('task.edit', compact('task', 'recaps'));
-}
+    {
+        $task->load('recap');
+        $recaps = Recap::orderBy('id', 'asc')->get();
+        return view('task.edit', compact('task', 'recaps'));
+    }
 
     public function update(Request $request, Task $task)
     {
@@ -205,7 +192,27 @@ class TaskController extends Controller
 
     public function destroy(Task $task)
     {
+        $recap = $task->recap;
+        
         $task->delete();
+        
+        if ($recap) {
+            $hasOtherTasks = $recap->tasks()->exists();
+            
+            if (!$hasOtherTasks) {
+                $recap->status = 'pending';
+                $recap->save();
+            } else {
+                $hasOtherPending = $recap->tasks()->where('status', '!=', 'completed')->exists();
+                
+                if (!$hasOtherPending) {
+                    $recap->status = 'completed';
+                } else {
+                    $recap->status = 'scheduled';
+                }
+                $recap->save();
+            }
+        }
         return redirect()->route('tasks.index')->with('success', 'Task berhasil dihapus.');
     }
 
@@ -265,30 +272,29 @@ class TaskController extends Controller
     }
 
     public function dashboard()
-{
-    $today = Carbon::today('Asia/Jakarta');
-    $now = Carbon::now('Asia/Jakarta');
-    $startOfWeek = $today->copy()->startOfWeek();
-    $endOfWeek = $today->copy()->endOfWeek();
+    {
+        $today = Carbon::today('Asia/Jakarta');
+        $now = Carbon::now('Asia/Jakarta');
+        $startOfWeek = $today->copy()->startOfWeek();
+        $endOfWeek = $today->copy()->endOfWeek();
 
-    $tasks = Task::with('recap')
-        ->where('status', 'pending')
-        ->orderBy('datetime', 'asc')
-        ->get();
+        $tasks = Task::with('recap')
+            ->where('status', 'pending')
+            ->orderBy('datetime', 'asc')
+            ->get();
 
-    $totalTasks = $tasks->count();
+        $totalTasks = $tasks->count();
 
-    $todayTasks = $tasks->filter(fn($task) => $task->datetime->setTimezone('Asia/Jakarta')->isSameDay($today))->count();
+        $todayTasks = $tasks->filter(fn($task) => $task->datetime->setTimezone('Asia/Jakarta')->isSameDay($today))->count();
 
-    $weekTasks = $tasks->filter(fn($task) => $task->datetime->between($startOfWeek, $endOfWeek))->count();
+        $weekTasks = $tasks->filter(fn($task) => $task->datetime->between($startOfWeek, $endOfWeek))->count();
 
-    $upcomingTasks = $tasks->filter(fn($task) => $task->datetime->isAfter($today))->count();
+        $upcomingTasks = $tasks->filter(fn($task) => $task->datetime->isAfter($today))->count();
 
-    // Add overdue tasks calculation
-    $overdueTasks = $tasks->filter(fn($task) => $task->datetime->isBefore($now))->count();
+        $overdueTasks = $tasks->filter(fn($task) => $task->datetime->isBefore($now))->count();
 
-    return view('dashboard', compact('tasks', 'totalTasks', 'todayTasks', 'weekTasks', 'upcomingTasks', 'overdueTasks'));
-}
+        return view('dashboard', compact('tasks', 'totalTasks', 'todayTasks', 'weekTasks', 'upcomingTasks', 'overdueTasks'));
+    }
 
    public function getOverdueTasks() {
     $now = Carbon::now('Asia/Jakarta');
