@@ -1,21 +1,23 @@
 {
-  "version": 2,
-  "framework": null,
-  "builds": [
-    {
-      "src": "/api/index.php",
-      "use": "vercel-php@0.7.0"
-    }
-  ],
+    "version": 2,
+    "framework": null,
+    "functions": {
+        "api/index.php": { "runtime": "vercel-php@0.7.4" }
+    },
+
   "routes": [
     {
       "src": "/(.*)",
       "dest": "/api/index.php"
     }
   ],
+
+  "public": true,
+  "buildCommand": "vite build",
+  "outputDirectory": "public",
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
+    "APP_DEBUG": "false",
     "APP_URL": "https://buddies.vercel.app",
     "APP_KEY": "base64:t2hDaGrKsZ3qwVhuva7HnK7nl5uYDAk6ZOD6OR0zb8o=",
     "DB_CONNECTION": "mysql",
